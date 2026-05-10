@@ -51,10 +51,14 @@ export default function ContactPage() {
                     <h3 className="text-lg font-playfair font-bold text-[#E6A520] mb-2">
                       📍 Location
                     </h3>
-                    <p className="text-gray-700">
-                      Dar es Salaam<br />
-                      Tanzania
-                    </p>
+                    <a 
+                      href="https://maps.app.goo.gl/srVJ3ortavd8J7cW7?g_st=awb" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-[#E6A520] hover:text-[#C68A1A] font-semibold"
+                    >
+                      Dar es Salaam, Tanzania
+                    </a>
                   </div>
 
                   {/* Email */}
@@ -63,7 +67,7 @@ export default function ContactPage() {
                       ✉️ Email
                     </h3>
                     <a href="mailto:hello@valtrixprofchef.com" className="text-[#E6A520] hover:text-[#C68A1A] font-semibold">
-                      hello@valtrixprofchef.com
+                      valtrixprofchef@gmail.com
                     </a>
                   </div>
 
@@ -72,8 +76,8 @@ export default function ContactPage() {
                     <h3 className="text-lg font-playfair font-bold text-[#E6A520] mb-2">
                       📞 Phone
                     </h3>
-                    <a href="tel:+255123456789" className="text-[#E6A520] hover:text-[#C68A1A] font-semibold">
-                      +255 123 456 789
+                    <a href="tel:+255655734453" className="text-[#E6A520] hover:text-[#C68A1A] font-semibold">
+                      +255 655 734 453
                     </a>
                   </div>
 
