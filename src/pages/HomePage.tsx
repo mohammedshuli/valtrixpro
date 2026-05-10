@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ROUTES, MOCK_TESTIMONIALS } from '../lib/constants';
 import ServicesGrid from '../components/sections/ServicesGrid';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
+import heroBackground from '../assets/hero-hero.jpg';
 
 export default function HomePage() {
   const containerVariants = {
@@ -31,17 +32,17 @@ export default function HomePage() {
         transition={{ duration: 1 }}
         className="relative h-[70vh] md:h-[90vh] bg-cover bg-center flex items-center justify-center"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1559521713-95d5634ae3a7?w=1600&h=900&fit=crop)',
+          backgroundImage: `url(${heroBackground})`,
           backgroundAttachment: 'fixed',
         }}
       >
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-black/55"></div>
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
           <motion.h1
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-5xl md:text-7xl font-playfair font-bold mb-6 leading-tight"
+            className="text-5xl md:text-7xl font-playfair font-bold mb-6 leading-tight text-white drop-shadow-[0_10px_15px_rgba(0,0,0,0.5)]"
           >
             Experience Culinary Excellence
           </motion.h1>
@@ -49,7 +50,7 @@ export default function HomePage() {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-xl md:text-2xl font-inter mb-8 opacity-90"
+            className="text-xl md:text-2xl font-inter mb-8 opacity-90 text-white"
           >
             Valtrix Pro Chef brings world-class gastronomy to Tanzania
           </motion.p>
