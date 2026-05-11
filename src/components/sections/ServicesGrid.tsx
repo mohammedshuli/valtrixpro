@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ROUTES } from '../../lib/constants';
 
 const serviceLinks: Record<string, string> = {
-  'private-chef-experiences': ROUTES.CATERING,
+  'private-chef-experiences': ROUTES.PRIVATE_CHEF,
   'premium-catering': ROUTES.CATERING,
   'corporate-events': ROUTES.CORPORATE_EVENTS,
   'valtrix-fresh': ROUTES.MEAL_PREP,

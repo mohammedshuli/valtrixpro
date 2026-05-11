@@ -11,9 +11,11 @@ export const submitCateringInquiry = async (data: schemas.CateringInquiry) => {
         name: data.name,
         email: data.email,
         phone: data.phone,
-        event_date: data.event_date,
+        event_type: data.event_type,
         guest_count: data.guest_count,
-        budget: data.budget,
+        event_date: data.event_date,
+        location: data.location,
+        catering_style: data.catering_style,
         special_requirements: data.special_requirements,
         status: 'pending',
       },
@@ -83,6 +85,28 @@ export const submitConsultationRequest = async (data: schemas.Consultation) => {
         available_dates: data.available_dates,
         budget: data.budget,
         requirements: data.requirements,
+        status: 'pending',
+      },
+    ])
+    .select();
+
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
+
+// Private Chef Inquiries
+export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry) => {
+  const { data: result, error } = await supabase
+    .from('consultations')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        consultation_type: data.event_type,
+        available_dates: data.preferred_date,
+        budget: null,
+        requirements: `Location: ${data.location}${data.special_requests ? `\nSpecial Requests: ${data.special_requests}` : ''}`,
         status: 'pending',
       },
     ])

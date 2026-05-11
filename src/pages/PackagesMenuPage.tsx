@@ -59,14 +59,18 @@ export default function PackagesMenuPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative py-20 bg-gradient-to-br from-[#FFF8E7] to-[#FFD77A]/20"
+        className="relative py-20 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/src/assets/menu.jpg')`,
+        }}
       >
-        <div className="section-container text-center">
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="relative section-container text-center text-white">
           <motion.h1
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-5xl md:text-6xl font-playfair font-bold text-[#7A4A00] mb-6"
+            className="text-5xl md:text-6xl font-playfair font-bold text-white mb-6"
           >
             Packages & Menu
           </motion.h1>
@@ -74,7 +78,7 @@ export default function PackagesMenuPage() {
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-xl text-gray-700 max-w-2xl mx-auto mb-8"
+            className="text-xl text-white max-w-2xl mx-auto mb-8"
           >
             Discover our premium catering packages and curated menu selections,
             crafted to elevate every dining experience.

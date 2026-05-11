@@ -321,6 +321,7 @@ export const ROUTES = {
   SERVICES: '/services',
   PACKAGES_MENU: '/packages-menu',
   CATERING: '/catering',
+  PRIVATE_CHEF: '/private-chef-experiences',
   CORPORATE_EVENTS: '/corporate-events',
   MEAL_PREP: '/valtrix-fresh',
   CULINARY_EXPERIENCES: '/culinary-experiences',

@@ -10,13 +10,17 @@ export default function ServicesPage() {
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-white py-16 md:py-24"
+        className="relative py-16 md:py-24 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/src/assets/event.jpg')`,
+        }}
       >
-        <div className="section-container text-center">
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold text-[#7A4A00] mb-6">
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="relative section-container text-center text-white">
+          <h1 className="text-5xl md:text-6xl font-playfair font-bold text-white mb-6">
             Our Services
           </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
+          <p className="text-xl text-white max-w-2xl mx-auto">
             Seven premium culinary and hospitality services designed to exceed expectations
           </p>
         </div>

@@ -7,9 +7,11 @@ export const cateringInquirySchema = z.object({
   name: z.string().min(FORM_CONSTRAINTS.nameMin).max(FORM_CONSTRAINTS.nameMax),
   email: z.string().email(),
   phone: z.string().regex(phoneRegex, 'Invalid phone number'),
-  event_date: z.string().date('Invalid date'),
+  event_type: z.string().min(2),
   guest_count: z.number().min(1).max(10000),
-  budget: z.string().optional(),
+  event_date: z.string().date('Invalid date'),
+  location: z.string().min(5).max(255),
+  catering_style: z.string().optional(),
   special_requirements: z.string().max(FORM_CONSTRAINTS.messageMax).optional(),
 });
 
@@ -45,6 +47,17 @@ export const consultationSchema = z.object({
   requirements: z.string().max(FORM_CONSTRAINTS.messageMax).optional(),
 });
 
+export const privateChefInquirySchema = z.object({
+  name: z.string().min(FORM_CONSTRAINTS.nameMin).max(FORM_CONSTRAINTS.nameMax),
+  email: z.string().email(),
+  phone: z.string().regex(phoneRegex, 'Invalid phone number'),
+  event_type: z.string().min(2),
+  guest_count: z.number().min(1).max(1000),
+  preferred_date: z.string().date('Invalid date'),
+  location: z.string().min(5).max(255),
+  special_requests: z.string().max(FORM_CONSTRAINTS.messageMax).optional(),
+});
+
 export const courseRegistrationSchema = z.object({
   name: z.string().min(FORM_CONSTRAINTS.nameMin).max(FORM_CONSTRAINTS.nameMax),
   email: z.string().email(),
@@ -67,5 +80,6 @@ export type CateringInquiry = z.infer<typeof cateringInquirySchema>;
 export type CorporateEvent = z.infer<typeof corporateEventSchema>;
 export type MealInquiry = z.infer<typeof mealInquirySchema>;
 export type Consultation = z.infer<typeof consultationSchema>;
+export type PrivateChefInquiry = z.infer<typeof privateChefInquirySchema>;
 export type CourseRegistration = z.infer<typeof courseRegistrationSchema>;
 export type ContactMessage = z.infer<typeof contactMessageSchema>;

@@ -10,6 +10,7 @@ import CateringPage from '../pages/CateringPage';
 import CorporateEventsPage from '../pages/CorporateEventsPage';
 import MealPrepPage from '../pages/MealPrepPage';
 import CulinaryExperiencesPage from '../pages/CulinaryExperiencesPage';
+import PrivateChefPage from '../pages/PrivateChefPage';
 import ChefConsultationPage from '../pages/ChefConsultationPage';
 import GalleryPage from '../pages/GalleryPage';
 import ContactPage from '../pages/ContactPage';
@@ -40,6 +41,7 @@ function App() {
             <Route path="/catering" element={<CateringPage />} />
             <Route path="/corporate-events" element={<CorporateEventsPage />} />
             <Route path="/valtrix-fresh" element={<MealPrepPage />} />
+            <Route path="/private-chef-experiences" element={<PrivateChefPage />} />
             <Route path="/culinary-experiences" element={<CulinaryExperiencesPage />} />
             <Route path="/chef-consultation" element={<ChefConsultationPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
