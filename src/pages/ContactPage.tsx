@@ -49,16 +49,12 @@ export default function ContactPage() {
                   {/* Address */}
                   <div>
                     <h3 className="text-lg font-playfair font-bold text-[#E6A520] mb-2">
-                      📍 Location
+                      📍Location
                     </h3>
-                    <a 
-                      href="https://maps.app.goo.gl/srVJ3ortavd8J7cW7?g_st=awb" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-[#E6A520] hover:text-[#C68A1A] font-semibold"
-                    >
-                      Dar es Salaam, Tanzania
-                    </a>
+                    <p className="text-gray-700">
+                      Dar es Salaam<br />
+                      Tanzania
+                    </p>
                   </div>
 
                   {/* Email */}
@@ -66,7 +62,7 @@ export default function ContactPage() {
                     <h3 className="text-lg font-playfair font-bold text-[#E6A520] mb-2">
                       ✉️ Email
                     </h3>
-                    <a href="mailto:hello@valtrixprofchef.com" className="text-[#E6A520] hover:text-[#C68A1A] font-semibold">
+                    <a href="mailto:valtrixprofchef@gmail.com" className="text-[#E6A520] hover:text-[#C68A1A] font-semibold">
                       valtrixprofchef@gmail.com
                     </a>
                   </div>
@@ -87,8 +83,8 @@ export default function ContactPage() {
                       🕒 Hours
                     </h3>
                     <p className="text-gray-700">
-                      Monday - Friday: 9:00 AM - 6:00 PM<br />
-                      Saturday: 10:00 AM - 4:00 PM<br />
+                      Monday - Friday: 8:00 AM - 6:00 PM<br />
+                      Saturday: 8:00 AM - 4:00 PM<br />
                       Sunday: By appointment
                     </p>
                   </div>
