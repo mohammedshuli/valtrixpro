@@ -9,6 +9,7 @@ export default function Header() {
   const menuItems = [
     { label: 'Home', path: ROUTES.HOME },
     { label: 'Services', path: ROUTES.SERVICES },
+    { label: 'Packages/Menu', path: ROUTES.PACKAGES_MENU },
     { label: 'About', path: ROUTES.ABOUT },
     { label: 'Gallery', path: ROUTES.GALLERY },
     { label: 'Contact', path: ROUTES.CONTACT },

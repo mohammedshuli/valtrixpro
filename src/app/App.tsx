@@ -5,6 +5,7 @@ import AdminLayout from '../layouts/AdminLayout';
 import HomePage from '../pages/HomePage';
 import AboutPage from '../pages/AboutPage';
 import ServicesPage from '../pages/ServicesPage';
+import PackagesMenuPage from '../pages/PackagesMenuPage';
 import CateringPage from '../pages/CateringPage';
 import CorporateEventsPage from '../pages/CorporateEventsPage';
 import MealPrepPage from '../pages/MealPrepPage';
@@ -35,6 +36,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/packages-menu" element={<PackagesMenuPage />} />
             <Route path="/catering" element={<CateringPage />} />
             <Route path="/corporate-events" element={<CorporateEventsPage />} />
             <Route path="/valtrix-fresh" element={<MealPrepPage />} />
