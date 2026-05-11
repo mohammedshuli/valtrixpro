@@ -8,9 +8,10 @@ interface FeaturedFoodCardProps {
   item: FoodMenuItem;
   index: number;
   onAddToCart: (itemId: string) => void;
+  onClick?: (itemId: string) => void;
 }
 
-export default function FeaturedFoodCard({ item, index, onAddToCart }: FeaturedFoodCardProps) {
+export default function FeaturedFoodCard({ item, index, onAddToCart, onClick }: FeaturedFoodCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-TZ', {
       style: 'currency',
@@ -31,7 +32,8 @@ export default function FeaturedFoodCard({ item, index, onAddToCart }: FeaturedF
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer"
+      onClick={() => onClick?.(item.id)}
     >
       {/* Featured Badge */}
       <div className="bg-gradient-to-r from-[#E6A520] to-[#FFD77A] text-[#7A4A00] text-xs font-bold text-center py-2">

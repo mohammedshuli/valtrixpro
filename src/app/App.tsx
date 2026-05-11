@@ -14,6 +14,8 @@ import PrivateChefPage from '../pages/PrivateChefPage';
 import ChefConsultationPage from '../pages/ChefConsultationPage';
 import GalleryPage from '../pages/GalleryPage';
 import ContactPage from '../pages/ContactPage';
+import FoodDetailPage from '../pages/menu/FoodDetailPage';
+import PackageDetailPage from '../pages/packages/PackageDetailPage';
 import AdminLoginPage from '../pages/admin/AdminLoginPage';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import '../index.css';
@@ -38,6 +40,8 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/packages-menu" element={<PackagesMenuPage />} />
+            <Route path="/menu/:foodId" element={<FoodDetailPage />} />
+            <Route path="/packages/:packageId" element={<PackageDetailPage />} />
             <Route path="/catering" element={<CateringPage />} />
             <Route path="/corporate-events" element={<CorporateEventsPage />} />
             <Route path="/valtrix-fresh" element={<MealPrepPage />} />

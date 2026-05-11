@@ -7,9 +7,10 @@ type CateringPackage = typeof CATERING_PACKAGES[number];
 interface PackageCardProps {
   package: CateringPackage;
   index: number;
+  onClick?: (packageId: string) => void;
 }
 
-export default function PackageCard({ package: pkg, index }: PackageCardProps) {
+export default function PackageCard({ package: pkg, index, onClick }: PackageCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-TZ', {
       style: 'currency',
@@ -24,7 +25,8 @@ export default function PackageCard({ package: pkg, index }: PackageCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer"
+      onClick={() => onClick?.(pkg.id)}
     >
       {/* Package Image */}
       <div className="relative h-48 overflow-hidden">

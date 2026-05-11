@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { CATERING_PACKAGES, MENU_CATEGORIES, FOOD_MENU_ITEMS, FEATURED_FOODS } from '../lib/constants';
 import PackageCard from '../components/menu/PackageCard';
 import FoodCard from '../components/menu/FoodCard';
@@ -9,6 +10,7 @@ import CategoryTabs from '../components/menu/CategoryTabs';
 import CartIcon from '../components/menu/CartIcon';
 
 export default function PackagesMenuPage() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [cartItems, setCartItems] = useState<string[]>([]);
@@ -30,6 +32,14 @@ export default function PackagesMenuPage() {
 
   const addToCart = (itemId: string) => {
     setCartItems(prev => [...prev, itemId]);
+  };
+
+  const handleFoodClick = (foodId: string) => {
+    navigate(`/menu/${foodId}`);
+  };
+
+  const handlePackageClick = (packageId: string) => {
+    navigate(`/packages/${packageId}`);
   };
 
   const containerVariants = {
@@ -59,35 +69,63 @@ export default function PackagesMenuPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative py-20 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('/src/assets/menu.jpg')`,
-        }}
+        className="relative py-24 bg-gradient-to-br from-[#FFF8E7] to-[#FFD77A]/20 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="relative section-container text-center text-white">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 border-2 border-[#E6A520] rounded-full"></div>
+          <div className="absolute top-20 right-20 w-24 h-24 border border-[#7A4A00] rounded-full"></div>
+          <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-[#FFD77A] rounded-full"></div>
+        </div>
+
+        <div className="relative section-container text-center">
           <motion.h1
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-5xl md:text-6xl font-playfair font-bold text-white mb-6"
+            className="text-6xl md:text-7xl font-playfair font-bold text-[#7A4A00] mb-6 leading-tight"
           >
-            Packages & Menu
+            Curated Culinary
+            <br />
+            <span className="text-[#E6A520]">Experiences</span>
           </motion.h1>
           <motion.p
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-xl text-white max-w-2xl mx-auto mb-8"
+            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed font-inter"
           >
-            Discover our premium catering packages and curated menu selections,
-            crafted to elevate every dining experience.
+            Luxury meals crafted for discerning palates. Premium catering packages for unforgettable events.
+            Exceptional dining experiences that transcend the ordinary.
           </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+          >
+            <button
+              onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-[#E6A520] hover:bg-[#7A4A00] text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Explore Menu
+            </button>
+            <button
+              onClick={() => document.getElementById('packages-section')?.scrollIntoView({ behavior: 'smooth' })}
+              className="border-2 border-[#7A4A00] text-[#7A4A00] hover:bg-[#7A4A00] hover:text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 text-lg"
+            >
+              Explore Catering Packages
+            </button>
+          </motion.div>
         </div>
       </motion.section>
 
-      {/* Catering Packages Section */}
-      <section className="section bg-white">
+      {/* Featured Items Section */}
+      <section className="section bg-white py-20">
         <div className="section-container">
           <motion.div
             variants={containerVariants}
@@ -97,7 +135,114 @@ export default function PackagesMenuPage() {
             className="text-center mb-16"
           >
             <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
-              Catering Packages
+              Signature Creations
+            </motion.h2>
+            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto">
+              Chef-curated masterpieces showcasing the finest in Tanzanian and international cuisine.
+              Each dish tells a story of passion, tradition, and innovation.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {featuredFoodItems.map((item, index) => (
+              <FeaturedFoodCard
+                key={item.id}
+                item={item}
+                index={index}
+                onAddToCart={addToCart}
+                onClick={() => handleFoodClick(item.id)}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Food Categories + Search */}
+      <section id="menu-section" className="section bg-[#FFF8E7] py-16">
+        <div className="section-container">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
+              Our Culinary Collection
+            </motion.h2>
+            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
+              Discover our comprehensive menu featuring breakfast, lunch, dinner, and specialty items
+              crafted with premium ingredients and culinary expertise.
+            </motion.p>
+
+            {/* Search Bar */}
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search for exquisite dishes..."
+            />
+          </motion.div>
+
+          {/* Category Tabs */}
+          <CategoryTabs
+            categories={MENU_CATEGORIES}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+        </div>
+      </section>
+
+      {/* Food Menu Grid */}
+      <section className="section bg-white py-16">
+        <div className="section-container">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          >
+            {filteredFoodItems.map((item, index) => (
+              <FoodCard
+                key={item.id}
+                item={item}
+                index={index}
+                onAddToCart={addToCart}
+                onClick={() => handleFoodClick(item.id)}
+              />
+            ))}
+          </motion.div>
+
+          {filteredFoodItems.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <p className="text-gray-500 text-lg">No items found matching your search.</p>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Catering Packages Grid */}
+      <section id="packages-section" className="section bg-[#FFF8E7] py-20">
+        <div className="section-container">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
+              Premium Catering Packages
             </motion.h2>
             <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto">
               Elevate your events with our expertly crafted catering packages,
@@ -113,109 +258,14 @@ export default function PackagesMenuPage() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {CATERING_PACKAGES.map((pkg, index) => (
-              <PackageCard key={pkg.id} package={pkg} index={index} />
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Featured Foods Section */}
-      <section className="section bg-[#FFF8E7]">
-        <div className="section-container">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
-              Featured Dishes
-            </motion.h2>
-            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto">
-              Signature creations from our executive chefs, showcasing the finest in Tanzanian and international cuisine.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {featuredFoodItems.map((item, index) => (
-              <FeaturedFoodCard
-                key={item.id}
-                item={item}
+              <PackageCard
+                key={pkg.id}
+                package={pkg}
                 index={index}
-                onAddToCart={addToCart}
+                onClick={() => handlePackageClick(pkg.id)}
               />
             ))}
           </motion.div>
-        </div>
-      </section>
-
-      {/* Food Menu Section */}
-      <section className="section bg-white">
-        <div className="section-container">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
-              Our Menu
-            </motion.h2>
-            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
-              Explore our comprehensive menu featuring breakfast, lunch, dinner, and specialty items
-              crafted with premium ingredients and culinary expertise.
-            </motion.p>
-
-            {/* Search Bar */}
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Search for dishes..."
-            />
-          </motion.div>
-
-          {/* Category Tabs */}
-          <CategoryTabs
-            categories={MENU_CATEGORIES}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-
-          {/* Food Grid */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-12"
-          >
-            {filteredFoodItems.map((item, index) => (
-              <FoodCard
-                key={item.id}
-                item={item}
-                index={index}
-                onAddToCart={addToCart}
-              />
-            ))}
-          </motion.div>
-
-          {filteredFoodItems.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <p className="text-gray-500 text-lg">No items found matching your search.</p>
-            </motion.div>
-          )}
         </div>
       </section>
     </div>

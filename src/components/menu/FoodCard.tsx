@@ -8,9 +8,10 @@ interface FoodCardProps {
   item: FoodMenuItem;
   index: number;
   onAddToCart: (itemId: string) => void;
+  onClick?: (itemId: string) => void;
 }
 
-export default function FoodCard({ item, index, onAddToCart }: FoodCardProps) {
+export default function FoodCard({ item, index, onAddToCart, onClick }: FoodCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-TZ', {
       style: 'currency',
@@ -31,7 +32,8 @@ export default function FoodCard({ item, index, onAddToCart }: FoodCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.05 }}
-      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
+      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer"
+      onClick={() => onClick?.(item.id)}
     >
       {/* Food Image */}
       <div className="relative h-48 overflow-hidden">
