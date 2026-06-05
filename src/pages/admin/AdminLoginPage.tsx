@@ -96,11 +96,7 @@ export default function AdminLoginPage() {
           </motion.button>
         </form>
 
-        <p className="text-center text-gray-600 text-sm mt-8">
-          Demo credentials:<br />
-          Email: admin@valtrixprofchef.com<br />
-          Password: (contact team)
-        </p>
+       
       </motion.div>
     </div>
   );

@@ -1,23 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { fetchAllInquiries } from '../../services/supabaseService';
-import { UI_CONSTANTS } from '../../lib/constants';
+import { ROUTES } from '../../lib/constants';
 import type { PaginatedInquiryResult } from '../../services/supabaseService';
-import type { CateringBooking, CorporateEvent, MealInquiry, InquiryStatus } from '../../types';
+import type { InquiryStatus } from '../../types';
 
 type InquiryCategoryKey = 'catering' | 'corporate' | 'meals' | 'consultations' | 'courses' | 'contact';
 
-type CategoryPageState = Record<InquiryCategoryKey, number>;
-
 type InquiryResults = Record<InquiryCategoryKey, PaginatedInquiryResult<unknown>>;
 
-const defaultPageState: CategoryPageState = {
-  catering: 1,
-  corporate: 1,
-  meals: 1,
-  consultations: 1,
-  courses: 1,
-  contact: 1,
+type DashboardInquiry = {
+  id: string;
+  category: InquiryCategoryKey;
+  label: string;
+  email: string;
+  date: string;
+  status: InquiryStatus;
+};
+
+const categoryConfig: Record<InquiryCategoryKey, { label: string; icon: string; accent: string }> = {
+  catering: { label: 'Catering', icon: '🍽️', accent: 'from-[#FFD77A] to-[#E6A520]' },
+  corporate: { label: 'Corporate', icon: '🏢', accent: 'from-[#E6A520] to-[#C68A1A]' },
+  meals: { label: 'Meal Prep', icon: '🥗', accent: 'from-[#7A4A00] to-[#5A3A00]' },
+  consultations: { label: 'Consultations', icon: '🗓️', accent: 'from-[#C68A1A] to-[#A36010]' },
+  courses: { label: 'Masterclasses', icon: '🎓', accent: 'from-[#8B5A2B] to-[#6B4A1B]' },
+  contact: { label: 'Contact', icon: '✉️', accent: 'from-[#7A4A00] to-[#9A6C28]' },
 };
 
 const statusClasses: Record<InquiryStatus, string> = {
@@ -27,12 +35,63 @@ const statusClasses: Record<InquiryStatus, string> = {
   completed: 'bg-gray-100 text-gray-800',
 };
 
+const normalizeInquiry = (category: InquiryCategoryKey, item: Record<string, unknown>): DashboardInquiry => {
+  const baseDate = typeof item.created_at === 'string' ? item.created_at : '';
+  const date = baseDate ? new Date(baseDate).toLocaleDateString() : 'Unknown';
+  const status = (item.status as InquiryStatus) || 'pending';
+
+  const common = {
+    id: `${category}-${item.id ?? Math.random().toString(36).slice(2)}`,
+    category,
+    email: (item.email as string) || '—',
+    date,
+    status,
+  };
+
+  switch (category) {
+    case 'catering':
+      return {
+        ...common,
+        label: (item.name as string) || 'Catering inquiry',
+      };
+    case 'corporate':
+      return {
+        ...common,
+        label: (item.company_name as string) || 'Corporate inquiry',
+      };
+    case 'meals':
+      return {
+        ...common,
+        label: (item.name as string) || 'Meal prep inquiry',
+      };
+    case 'consultations':
+      return {
+        ...common,
+        label: (item.name as string) || 'Consultation inquiry',
+      };
+    case 'courses':
+      return {
+        ...common,
+        label: (item.name as string) || 'Course registration',
+      };
+    case 'contact':
+      return {
+        ...common,
+        label: (item.subject as string) || (item.name as string) || 'Contact message',
+      };
+    default:
+      return {
+        ...common,
+        label: 'Inquiry',
+      };
+  }
+};
+
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState('inquiries');
-  const [pages, setPages] = useState<CategoryPageState>(defaultPageState);
   const [inquiries, setInquiries] = useState<InquiryResults | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadInquiries = async () => {
@@ -40,7 +99,7 @@ export default function AdminDashboard() {
       setErrorMessage(null);
 
       try {
-        const data = await fetchAllInquiries(pages, UI_CONSTANTS.ADMIN_PAGE_SIZE);
+        const data = await fetchAllInquiries();
         setInquiries(data);
       } catch (error) {
         console.error('Error loading inquiries:', error);
@@ -51,312 +110,181 @@ export default function AdminDashboard() {
     };
 
     loadInquiries();
-  }, [pages]);
+  }, []);
 
-  const totalInquiries = inquiries
-    ? Object.values(inquiries).reduce((sum, result) => sum + result.totalCount, 0)
-    : 0;
+  const totals = useMemo(() => {
+    const byCategory = Object.fromEntries(
+      (Object.keys(categoryConfig) as InquiryCategoryKey[]).map((category) => [
+        category,
+        inquiries?.[category]?.totalCount ?? 0,
+      ])
+    ) as Record<InquiryCategoryKey, number>;
 
-  const getPaginatedResults = <T extends object>(category: InquiryCategoryKey) =>
-    inquiries?.[category] as PaginatedInquiryResult<T> | undefined;
+    const total = Object.values(byCategory).reduce((sum, value) => sum + value, 0);
+    const pending = Object.values(inquiries ?? {}).reduce((sum, result) => {
+      const items = result?.data ?? [];
+      return sum + items.filter((item) => (item as { status?: string }).status === 'pending').length;
+    }, 0);
 
-  const changePage = (category: InquiryCategoryKey, nextPage: number) => {
-    setPages((current) => ({ ...current, [category]: nextPage }));
-  };
+    return { byCategory, total, pending };
+  }, [inquiries]);
 
-  const tabs = [
-    { id: 'inquiries', label: '📧 Inquiries', count: totalInquiries },
-    { id: 'content', label: '📝 Content' },
-    { id: 'media', label: '🖼️ Media' },
-    { id: 'analytics', label: '📈 Analytics' },
-  ];
+  const latestInquiries = useMemo(() => {
+    if (!inquiries) return [];
+
+    return (Object.entries(inquiries) as [InquiryCategoryKey, PaginatedInquiryResult<unknown>][]) 
+      .flatMap(([category, result]) => result.data.map((item) => normalizeInquiry(category, item as Record<string, unknown>)))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 6);
+  }, [inquiries]);
 
   return (
-    <div className="p-8 bg-[#FFF8E7]">
-      <div className="mb-8">
-        <h1 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-2">
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-700">Manage your Valtrix Pro Chef platform</p>
-      </div>
+    <div className="min-h-screen bg-[#FFF8E7]">
+      <div className="section-container py-10">
+        <div className="mb-8">
+          <h1 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-2">Admin Dashboard</h1>
+          <p className="text-gray-700 max-w-2xl">
+            A concise overview of all incoming requests, pending activity, and quick access to the admin tools.
+          </p>
+        </div>
 
-      {/* Tabs */}
-      <div className="flex gap-4 mb-8 flex-wrap">
-        {tabs.map((tab) => (
-          <motion.button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              activeTab === tab.id
-                ? 'bg-[#E6A520] text-white shadow-lg'
-                : 'bg-white text-[#7A4A00] border-2 border-[#E6A520] hover:bg-[#FFF8E7]'
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {tab.label}
-            {tab.count && tab.count > 0 && <span className="ml-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs">{tab.count}</span>}
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Content */}
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg shadow-lg p-8"
-      >
-        {/* Inquiries Tab */}
-        {activeTab === 'inquiries' && (
-          <div>
-            <h2 className="text-2xl font-playfair font-bold text-[#7A4A00] mb-6">
-              All Inquiries
-            </h2>
-
-            {isLoading ? (
-              <p className="text-gray-600">Loading inquiries...</p>
-            ) : errorMessage ? (
-              <p className="text-red-600">{errorMessage}</p>
-            ) : !inquiries ? (
-              <p className="text-gray-600">Error loading inquiries</p>
-            ) : (
-              <div className="space-y-8">
-                {/* Catering */}
-                <div>
-                  {(() => {
-                    const result = getPaginatedResults<CateringBooking>('catering');
-                    const items = result?.data ?? [];
-
-                    return (
-                      <>
-                        <h3 className="text-xl font-semibold text-[#E6A520] mb-4">
-                          Catering Inquiries ({result?.totalCount ?? 0})
-                        </h3>
-
-                        {items.length > 0 ? (
-                          <>
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-sm">
-                                <thead>
-                                  <tr className="border-b-2 border-[#E6A520]">
-                                    <th className="text-left py-3">Name</th>
-                                    <th className="text-left py-3">Email</th>
-                                    <th className="text-left py-3">Date</th>
-                                    <th className="text-left py-3">Guests</th>
-                                    <th className="text-left py-3">Status</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {items.map((item) => (
-                                    <tr key={item.id} className="border-b hover:bg-gray-50">
-                                      <td className="py-3">{item.name}</td>
-                                      <td className="py-3">{item.email}</td>
-                                      <td className="py-3">{item.event_date}</td>
-                                      <td className="py-3">{item.guest_count}</td>
-                                      <td className="py-3">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClasses[item.status] ?? statusClasses.completed}`}>
-                                          {item.status}
-                                        </span>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                            <div className="mt-4 flex items-center justify-between gap-3 text-sm text-gray-700">
-                              <button
-                                type="button"
-                                className="rounded-lg border border-[#E6A520] px-4 py-2 hover:bg-[#FFF8E7]"
-                                onClick={() => changePage('catering', Math.max(1, pages.catering - 1))}
-                                disabled={pages.catering <= 1}
-                              >
-                                Previous
-                              </button>
-                              <span>Page {pages.catering} of {Math.max(1, Math.ceil((result?.totalCount ?? 0) / UI_CONSTANTS.ADMIN_PAGE_SIZE))}</span>
-                              <button
-                                type="button"
-                                className="rounded-lg border border-[#E6A520] px-4 py-2 hover:bg-[#FFF8E7]"
-                                onClick={() => changePage('catering', pages.catering + 1)}
-                                disabled={items.length < UI_CONSTANTS.ADMIN_PAGE_SIZE}
-                              >
-                                Next
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <p className="text-gray-600">No catering inquiries yet</p>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-
-                {/* Corporate Events */}
-                <div>
-                  {(() => {
-                    const result = getPaginatedResults<CorporateEvent>('corporate');
-                    const items = result?.data ?? [];
-
-                    return (
-                      <>
-                        <h3 className="text-xl font-semibold text-[#E6A520] mb-4">
-                          Corporate Events ({result?.totalCount ?? 0})
-                        </h3>
-
-                        {items.length > 0 ? (
-                          <>
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-sm">
-                                <thead>
-                                  <tr className="border-b-2 border-[#E6A520]">
-                                    <th className="text-left py-3">Company</th>
-                                    <th className="text-left py-3">Contact</th>
-                                    <th className="text-left py-3">Date</th>
-                                    <th className="text-left py-3">Type</th>
-                                    <th className="text-left py-3">Status</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {items.map((item) => (
-                                    <tr key={item.id} className="border-b hover:bg-gray-50">
-                                      <td className="py-3">{item.company_name}</td>
-                                      <td className="py-3">{item.contact_name}</td>
-                                      <td className="py-3">{item.event_date}</td>
-                                      <td className="py-3">{item.event_type}</td>
-                                      <td className="py-3">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClasses[item.status] ?? statusClasses.completed}`}>
-                                          {item.status}
-                                        </span>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                            <div className="mt-4 flex items-center justify-between gap-3 text-sm text-gray-700">
-                              <button
-                                type="button"
-                                className="rounded-lg border border-[#E6A520] px-4 py-2 hover:bg-[#FFF8E7]"
-                                onClick={() => changePage('corporate', Math.max(1, pages.corporate - 1))}
-                                disabled={pages.corporate <= 1}
-                              >
-                                Previous
-                              </button>
-                              <span>Page {pages.corporate} of {Math.max(1, Math.ceil((result?.totalCount ?? 0) / UI_CONSTANTS.ADMIN_PAGE_SIZE))}</span>
-                              <button
-                                type="button"
-                                className="rounded-lg border border-[#E6A520] px-4 py-2 hover:bg-[#FFF8E7]"
-                                onClick={() => changePage('corporate', pages.corporate + 1)}
-                                disabled={items.length < UI_CONSTANTS.ADMIN_PAGE_SIZE}
-                              >
-                                Next
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <p className="text-gray-600">No corporate events yet</p>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-
-                {/* Meal Inquiries */}
-                <div>
-                  {(() => {
-                    const result = getPaginatedResults<MealInquiry>('meals');
-                    const count = result?.totalCount ?? 0;
-
-                    return (
-                      <>
-                        <h3 className="text-xl font-semibold text-[#E6A520] mb-4">Meal Prep Inquiries ({count})</h3>
-                        {count > 0 ? (
-                          <p className="text-gray-600">{count} meal prep inquiries</p>
-                        ) : (
-                          <p className="text-gray-600">No meal prep inquiries yet</p>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-            )}
+        <div className="grid gap-6 lg:grid-cols-3 mb-8">
+          <div className="card p-6">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#7A4A00]">Total Inquiries</p>
+            <p className="mt-4 text-5xl font-bold text-[#E6A520]">{totals.total}</p>
+            <p className="mt-2 text-sm text-gray-600">Total inbound requests across all admin categories.</p>
           </div>
-        )}
 
-        {/* Content Tab */}
-        {activeTab === 'content' && (
-          <div>
-            <h2 className="text-2xl font-playfair font-bold text-[#7A4A00] mb-6">
-              Content Management
-            </h2>
-            <p className="text-gray-600 mb-6">Edit homepage content, services, and testimonials</p>
-            
+          <div className="card p-6">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#7A4A00]">Pending</p>
+            <p className="mt-4 text-5xl font-bold text-[#7A4A00]">{totals.pending}</p>
+            <p className="mt-2 text-sm text-gray-600">Requests still waiting for response or follow-up.</p>
+          </div>
+
+          <div className="card p-6">
+            <p className="text-sm uppercase tracking-[0.2em] text-[#7A4A00]">Quick Actions</p>
+            <div className="mt-4 space-y-2 text-sm text-gray-600">
+              <p>Use the sidebar to manage inquiries, content, media, and analytics.</p>
+              <p className="font-medium text-[#7A4A00]">Last updated: {isLoading ? 'Loading...' : 'Current data'}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-4 mb-10">
+          {(Object.keys(categoryConfig) as InquiryCategoryKey[]).map((category) => (
+            <motion.div
+              key={category}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`rounded-3xl p-6 text-white bg-gradient-to-br ${categoryConfig[category].accent}`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.2em]">
+                    {categoryConfig[category].label}
+                  </p>
+                  <p className="mt-4 text-4xl font-bold">{totals.byCategory[category]}</p>
+                </div>
+                <span className="text-4xl">{categoryConfig[category].icon}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <section className="card p-8 lg:col-span-2">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-2xl font-playfair font-bold text-[#7A4A00]">Latest Inquiries</h2>
+                <p className="text-gray-600">Review the most recent guest requests at a glance.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.ADMIN_INQUIRIES)}
+                className="btn btn-outline"
+              >
+                View all inquiries
+              </button>
+            </div>
+
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#E6A520]">
+                    <th className="text-left py-3">Category</th>
+                    <th className="text-left py-3">Name</th>
+                    <th className="text-left py-3">Email</th>
+                    <th className="text-left py-3">Received</th>
+                    <th className="text-left py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5} className="py-6 text-center text-gray-600">Loading latest inquiries...</td>
+                    </tr>
+                  ) : errorMessage ? (
+                    <tr>
+                      <td colSpan={5} className="py-6 text-center text-red-600">{errorMessage}</td>
+                    </tr>
+                  ) : latestInquiries.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-6 text-center text-gray-600">No inquiries available yet.</td>
+                    </tr>
+                  ) : (
+                    latestInquiries.map((item) => (
+                      <tr key={item.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 text-sm font-medium text-[#7A4A00]">{categoryConfig[item.category].label}</td>
+                        <td className="py-3">{item.label}</td>
+                        <td className="py-3">{item.email}</td>
+                        <td className="py-3">{item.date}</td>
+                        <td className="py-3">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClasses[item.status]}`}>{item.status}</span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="card p-8">
+            <h2 className="text-2xl font-playfair font-bold text-[#7A4A00] mb-4">Quick Actions</h2>
             <div className="space-y-4">
-              <div className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-semibold text-[#7A4A00]">Homepage Hero Section</h3>
-                <p className="text-sm text-gray-600">Edit title, subtitle, and call-to-action</p>
-              </div>
-              <div className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-semibold text-[#7A4A00]">Services</h3>
-                <p className="text-sm text-gray-600">Manage service descriptions and details</p>
-              </div>
-              <div className="border border-gray-300 rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
-                <h3 className="font-semibold text-[#7A4A00]">Testimonials</h3>
-                <p className="text-sm text-gray-600">Add, edit, or remove client testimonials</p>
-              </div>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.ADMIN_INQUIRIES)}
+                className="btn btn-primary w-full"
+              >
+                Manage inquiries
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.ADMIN_CONTENT)}
+                className="btn btn-secondary w-full"
+              >
+                Edit content
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.ADMIN_MEDIA)}
+                className="btn btn-secondary w-full"
+              >
+                Update media
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.ADMIN_ANALYTICS)}
+                className="btn btn-secondary w-full"
+              >
+                View analytics
+              </button>
             </div>
-          </div>
-        )}
-
-        {/* Media Tab */}
-        {activeTab === 'media' && (
-          <div>
-            <h2 className="text-2xl font-playfair font-bold text-[#7A4A00] mb-6">
-              Media Management
-            </h2>
-            <p className="text-gray-600 mb-6">Upload and manage gallery images and banners</p>
-            
-            <div className="border-2 border-dashed border-[#E6A520] rounded-lg p-12 text-center hover:bg-gray-50 cursor-pointer">
-              <p className="text-gray-600 mb-4">📁 Drag and drop images here to upload</p>
-              <button className="btn-primary">Choose Files</button>
-            </div>
-          </div>
-        )}
-
-        {/* Analytics Tab */}
-        {activeTab === 'analytics' && (
-          <div>
-            <h2 className="text-2xl font-playfair font-bold text-[#7A4A00] mb-6">
-              Analytics Overview
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-gradient-to-br from-[#FFD77A] to-[#E6A520] rounded-lg p-6 text-white">
-                <div className="text-3xl font-bold">{getPaginatedResults('catering')?.totalCount ?? 0}</div>
-                <p className="text-sm opacity-90">Catering Inquiries</p>
-              </div>
-              <div className="bg-gradient-to-br from-[#E6A520] to-[#C68A1A] rounded-lg p-6 text-white">
-                <div className="text-3xl font-bold">{getPaginatedResults('corporate')?.totalCount ?? 0}</div>
-                <p className="text-sm opacity-90">Corporate Events</p>
-              </div>
-              <div className="bg-gradient-to-br from-[#7A4A00] to-[#5A3A00] rounded-lg p-6 text-white">
-                <div className="text-3xl font-bold">{getPaginatedResults('meals')?.totalCount ?? 0}</div>
-                <p className="text-sm opacity-90">Meal Inquiries</p>
-              </div>
-              <div className="bg-gradient-to-br from-[#8B5A2B] to-[#6B4A1B] rounded-lg p-6 text-white">
-                <div className="text-3xl font-bold">{getPaginatedResults('contact')?.totalCount ?? 0}</div>
-                <p className="text-sm opacity-90">Contact Messages</p>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-6">
-              <p className="text-gray-600">Monthly trends and detailed analytics coming soon</p>
-            </div>
-          </div>
-        )}
-      </motion.div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

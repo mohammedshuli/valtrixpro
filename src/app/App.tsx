@@ -19,6 +19,10 @@ import FoodDetailPage from '../pages/menu/FoodDetailPage';
 import PackageDetailPage from '../pages/packages/PackageDetailPage';
 import AdminLoginPage from '../pages/admin/AdminLoginPage';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminInquiriesPage from '../pages/admin/AdminInquiriesPage';
+import AdminContentPage from '../pages/admin/AdminContentPage';
+import AdminMediaPage from '../pages/admin/AdminMediaPage';
+import AdminAnalyticsPage from '../pages/admin/AdminAnalyticsPage';
 import '../index.css';
 
 const queryClient = new QueryClient({
@@ -58,6 +62,10 @@ function App() {
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="inquiries" element={<AdminInquiriesPage />} />
+            <Route path="content" element={<AdminContentPage />} />
+            <Route path="media" element={<AdminMediaPage />} />
+            <Route path="analytics" element={<AdminAnalyticsPage />} />
           </Route>
 
           {/* Catch all */}

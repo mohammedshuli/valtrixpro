@@ -18,7 +18,8 @@ export default function AdminSidebar() {
     { label: 'Analytics', icon: '📈', href: ROUTES.ADMIN_ANALYTICS },
   ];
 
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (href: string) =>
+    location.pathname === href || location.pathname.startsWith(`${href}/`);
 
   return (
     <aside className="w-64 bg-[#7A4A00] text-white min-h-screen flex flex-col">
