@@ -21,7 +21,10 @@ CREATE TABLE bookings (
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(20) NOT NULL,
   event_date DATE NOT NULL,
+  event_type VARCHAR(100),
   guest_count INTEGER NOT NULL,
+  location VARCHAR(255),
+  catering_style VARCHAR(100),
   budget VARCHAR(100),
   special_requirements TEXT,
   status inquiry_status DEFAULT 'pending',
@@ -39,6 +42,7 @@ CREATE TABLE corporate_events (
   event_type VARCHAR(100) NOT NULL,
   event_date DATE NOT NULL,
   guest_count INTEGER NOT NULL,
+  location VARCHAR(255),
   budget VARCHAR(100),
   requirements TEXT,
   status inquiry_status DEFAULT 'pending',
@@ -54,6 +58,7 @@ CREATE TABLE meal_inquiries (
   phone VARCHAR(20) NOT NULL,
   meal_type VARCHAR(100) NOT NULL,
   delivery_frequency VARCHAR(50),
+  delivery_location VARCHAR(255),
   dietary_requirements TEXT,
   quantity INTEGER,
   status inquiry_status DEFAULT 'pending',
@@ -100,6 +105,7 @@ CREATE TABLE contact_messages (
   subject VARCHAR(255),
   message TEXT NOT NULL,
   status inquiry_status DEFAULT 'pending',
+  is_read BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
@@ -114,6 +120,8 @@ CREATE TABLE services (
   icon VARCHAR(50),
   image_url VARCHAR(500),
   features JSONB,
+  is_active BOOLEAN DEFAULT true,
+  display_order INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
@@ -128,6 +136,7 @@ CREATE TABLE testimonials (
   image_url VARCHAR(500),
   service_type VARCHAR(100),
   "order" INTEGER DEFAULT 0,
+  is_featured BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
@@ -140,6 +149,8 @@ CREATE TABLE gallery (
   category VARCHAR(100),
   image_path VARCHAR(500) NOT NULL,
   "order" INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  alt_text VARCHAR(255),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
@@ -158,8 +169,10 @@ CREATE TABLE homepage_content (
 -- Create indexes for better query performance
 CREATE INDEX idx_bookings_status ON bookings(status);
 CREATE INDEX idx_bookings_created_at ON bookings(created_at DESC);
+CREATE INDEX idx_bookings_event_date ON bookings(event_date);
 CREATE INDEX idx_corporate_events_status ON corporate_events(status);
 CREATE INDEX idx_corporate_events_created_at ON corporate_events(created_at DESC);
+CREATE INDEX idx_corporate_events_event_date ON corporate_events(event_date);
 CREATE INDEX idx_meal_inquiries_status ON meal_inquiries(status);
 CREATE INDEX idx_meal_inquiries_created_at ON meal_inquiries(created_at DESC);
 CREATE INDEX idx_consultations_status ON consultations(status);
@@ -167,9 +180,15 @@ CREATE INDEX idx_consultations_created_at ON consultations(created_at DESC);
 CREATE INDEX idx_course_registrations_status ON course_registrations(status);
 CREATE INDEX idx_course_registrations_created_at ON course_registrations(created_at DESC);
 CREATE INDEX idx_contact_messages_status ON contact_messages(status);
+CREATE INDEX idx_contact_messages_is_read ON contact_messages(is_read);
 CREATE INDEX idx_contact_messages_created_at ON contact_messages(created_at DESC);
 CREATE INDEX idx_gallery_category ON gallery(category);
 CREATE INDEX idx_gallery_order ON gallery("order");
+CREATE INDEX idx_gallery_is_active ON gallery(is_active);
+CREATE INDEX idx_services_is_active ON services(is_active);
+CREATE INDEX idx_services_display_order ON services(display_order);
+CREATE INDEX idx_testimonials_is_featured ON testimonials(is_featured);
+CREATE INDEX idx_testimonials_order ON testimonials("order");
 
 -- Enable Row Level Security
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
