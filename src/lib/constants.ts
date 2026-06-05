@@ -314,6 +314,16 @@ export const FEATURED_FOODS = [
   'bbq-beef',
   'seafood-platter',
   'pizza',
+  'pilau',
+  'chips-mayai',
+  'fried-rice',
+  'burger',
+  'fresh-juice',
+  'shawarma',
+  'biryani',
+  'mishkaki',
+  'breakfast-special',
+  'tiramisu',
 ] as const;
 export const ROUTES = {
   HOME: '/',
@@ -321,6 +331,7 @@ export const ROUTES = {
   SERVICES: '/services',
   PACKAGES_MENU: '/packages-menu',
   CATERING: '/catering',
+  CATERING_PARTNERSHIPS: '/catering-partnerships',
   PRIVATE_CHEF: '/private-chef-experiences',
   CORPORATE_EVENTS: '/corporate-events',
   MEAL_PREP: '/valtrix-fresh',
@@ -385,4 +396,11 @@ export const FORM_CONSTRAINTS = {
   phoneMax: 20,
   messageMin: 10,
   messageMax: 2000,
+} as const;
+
+export const UI_CONSTANTS = {
+  ADMIN_PAGE_SIZE: 10,
+  CAROUSEL_INTERVAL: 4000,
+  FORM_SUBMISSION_TIMEOUT: 30000,
+  SUCCESS_MESSAGE_TIMEOUT: 3000,
 } as const;

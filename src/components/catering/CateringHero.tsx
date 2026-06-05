@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../lib/constants';
 import heroImage from '../../assets/event.jpg';
 
 export default function CateringHero() {

@@ -1,101 +1,115 @@
 import { motion } from 'framer-motion';
-import { consultationSchema } from '../lib/validationSchemas';
-import { submitConsultationRequest } from '../services/supabaseService';
-import InquiryForm from '../components/forms/InquiryForm';
+import ConsultationHero from '../components/chef-consultation/ConsultationHero';
+import ConsultationAreaCard from '../components/chef-consultation/ConsultationAreaCard';
+import ConsultationProcess from '../components/chef-consultation/ConsultationProcess';
+import ConsultationCTA from '../components/chef-consultation/ConsultationCTA';
+import aboutImage from '../assets/menu.jpg';
+
+const consultationAreas = [
+  {
+    title: 'Menu Development',
+    description: 'Strategic menu planning, culinary concept development, and dining experience design.',
+  },
+  {
+    title: 'Event Culinary Planning',
+    description: 'Professional guidance for premium events, galas, and special occasions.',
+  },
+  {
+    title: 'Catering Consultation',
+    description: 'Expert advice on catering operations, logistics, and culinary execution.',
+  },
+  {
+    title: 'Hospitality Experience Advisory',
+    description: 'Refined guidance on guest experience, service standards, and hospitality excellence.',
+  },
+  {
+    title: 'Food Presentation Guidance',
+    description: 'Professional consultation on plating aesthetics, visual storytelling, and culinary artistry.',
+  },
+  {
+    title: 'Premium Dining Concepts',
+    description: 'Strategic direction for luxury dining establishments and innovative culinary concepts.',
+  },
+];
 
 export default function ChefConsultationPage() {
-  const consultationFields = [
-    { name: 'name', label: 'Full Name', type: 'text' as const, placeholder: 'Your name', required: true },
-    { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@email.com', required: true },
-    { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
-    { name: 'consultation_type', label: 'Consultation Type', type: 'select' as const, options: [
-      { value: 'menu_planning', label: 'Menu Planning' },
-      { value: 'kitchen_design', label: 'Kitchen Design' },
-      { value: 'staff_training', label: 'Staff Training' },
-      { value: 'food_strategy', label: 'Food Strategy' },
-      { value: 'restaurant_launch', label: 'Restaurant/Venue Launch' },
-      { value: 'other', label: 'Other' },
-    ], required: true },
-    { name: 'available_dates', label: 'Available Meeting Dates', type: 'textarea' as const, placeholder: 'Your preferred dates and times for consultation' },
-    { name: 'budget', label: 'Budget', type: 'text' as const, placeholder: 'Estimated consultation budget' },
-    { name: 'requirements', label: 'Consultation Details', type: 'textarea' as const, placeholder: 'Tell us about your project, goals, and specific needs' },
-  ];
-
   return (
     <div className="bg-[#FFF8E7]">
-      {/* Hero */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-white py-16 md:py-24"
-      >
-        <div className="section-container text-center">
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold text-[#7A4A00] mb-6">
-            Chef Consultation
-          </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Expert guidance for your culinary vision
-          </p>
-        </div>
-      </motion.section>
+      <ConsultationHero />
 
-      {/* Showcase */}
-      <section className="section">
+      {/* About Consultation Services */}
+      <section className="bg-white py-16">
+        <div className="section-container grid gap-12 lg:grid-cols-[1fr_0.95fr] items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
+            <p className="text-sm uppercase tracking-[0.35em] text-[#E6A520]">What We Offer</p>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-[#7A4A00] leading-tight">
+              Expert Culinary Consulting Services
+            </h2>
+            <p className="max-w-2xl text-lg leading-relaxed text-[#4d3a23]">
+              Valtrix Pro Chef provides strategic culinary consultation and hospitality expertise designed for discerning clients seeking professional guidance and premium culinary direction.
+            </p>
+            <ul className="space-y-3">
+              {[
+                'One-on-one executive chef sessions',
+                'Custom menu development and curation',
+                'Event culinary planning and execution guidance',
+                'Hospitality experience optimization',
+                'Food presentation and plating expertise',
+                'Premium dining concept development',
+              ].map((item, idx) => (
+                <li key={idx} className="flex gap-3 items-start">
+                  <span className="text-[#E6A520] mt-1">✓</span>
+                  <span className="text-[#4d3a23]">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="overflow-hidden rounded-[1.5rem] shadow-[0_25px_70px_rgba(122,74,0,0.12)]"
+          >
+            <img
+              src={aboutImage}
+              alt="Professional chef consultation"
+              className="h-full w-full object-cover min-h-[480px]"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Consultation Areas */}
+      <section id="consultation-areas" className="py-16">
         <div className="section-container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop"
-                alt="Chef Consultation"
-                className="rounded-lg shadow-2xl"
-              />
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-6">
-                Strategic Culinary Guidance
-              </h2>
-              <ul className="space-y-4">
-                {[
-                  'One-on-one executive chef sessions',
-                  'Custom menu development',
-                  'Kitchen design and optimization',
-                  'Staff training programs',
-                  'Food cost analysis',
-                  'Long-term culinary strategy',
-                ].map((item, idx) => (
-                  <li key={idx} className="flex gap-3 items-start">
-                    <span className="text-[#E6A520] text-2xl">✓</span>
-                    <span className="text-gray-700 text-lg">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+          <div className="space-y-6 text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.35em] text-[#E6A520]">Consultation Areas</p>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-[#7A4A00]">
+              Areas of Expertise
+            </h2>
+            <p className="mx-auto max-w-2xl text-base text-[#4d3a23]">
+              Comprehensive culinary consulting across multiple areas of hospitality and culinary excellence.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {consultationAreas.map((area) => (
+              <ConsultationAreaCard key={area.title} title={area.title} description={area.description} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Inquiry Form */}
-      <section className="section bg-white">
-        <div className="section-container">
-          <InquiryForm
-            title="Schedule a Consultation"
-            description="Connect with our executive chef for expert culinary guidance"
-            schema={consultationSchema}
-            fields={consultationFields}
-            submitButtonText="Request Consultation"
-            onSubmit={submitConsultationRequest}
-            successMessage="Thank you! We'll confirm your consultation date and details soon."
-          />
-        </div>
-      </section>
+      <ConsultationProcess />
+      <ConsultationCTA />
     </div>
   );
 }

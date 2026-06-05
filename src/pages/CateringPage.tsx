@@ -6,7 +6,7 @@ import EventExperienceCard from '../components/catering/EventExperienceCard';
 import CateringGallery from '../components/catering/CateringGallery';
 import ProcessTimeline from '../components/catering/ProcessTimeline';
 import TestimonialCard from '../components/catering/TestimonialCard';
-import { cateringInquirySchema, type CateringInquiry } from '../lib/validationSchemas';
+import { cateringInquirySchema } from '../lib/validationSchemas';
 import { submitCateringInquiry } from '../services/supabaseService';
 import experienceOne from '../assets/event.jpg';
 import experienceTwo from '../assets/menu.jpg';
@@ -153,33 +153,33 @@ const testimonials = [
   },
 ];
 
-const cateringFields = [
-  { name: 'name', label: 'Name', type: 'text' as const, placeholder: 'Your full name', required: true },
-  { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@email.com', required: true },
-  { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
-  { name: 'event_type', label: 'Event Type', type: 'select' as const, required: true, options: [
-      { value: 'Wedding', label: 'Wedding Reception' },
-      { value: 'Corporate', label: 'Corporate Event' },
-      { value: 'Birthday', label: 'Birthday Celebration' },
-      { value: 'Private Party', label: 'Private Party' },
-      { value: 'VIP Event', label: 'VIP Event' },
-      { value: 'Family Event', label: 'Family Event' },
-      { value: 'Other', label: 'Other' },
-    ] },
-  { name: 'guest_count', label: 'Guest Count', type: 'number' as const, placeholder: 'Number of guests', required: true },
-  { name: 'event_date', label: 'Event Date', type: 'date' as const, required: true },
-  { name: 'location', label: 'Venue/Location', type: 'text' as const, placeholder: 'Event venue or location', required: true },
-  { name: 'catering_style', label: 'Catering Style', type: 'select' as const, required: false, options: [
-      { value: 'Buffet', label: 'Buffet Service' },
-      { value: 'Plated', label: 'Plated Service' },
-      { value: 'Family Style', label: 'Family Style' },
-      { value: 'Cocktail Reception', label: 'Cocktail Reception' },
-      { value: 'Mixed', label: 'Mixed Service' },
-    ] },
-  { name: 'special_requirements', label: 'Special Requirements', type: 'textarea' as const, placeholder: 'Dietary restrictions, themes, ambiance preferences, or special requests', required: false },
-];
-
 export default function CateringPage() {
+  const cateringFields = [
+    { name: 'name', label: 'Name', type: 'text' as const, placeholder: 'Your full name', required: true },
+    { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@email.com', required: true },
+    { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
+    { name: 'event_type', label: 'Event Type', type: 'select' as const, required: true, options: [
+        { value: 'Wedding', label: 'Wedding Reception' },
+        { value: 'Corporate', label: 'Corporate Event' },
+        { value: 'Birthday', label: 'Birthday Celebration' },
+        { value: 'Private Party', label: 'Private Party' },
+        { value: 'VIP Event', label: 'VIP Event' },
+        { value: 'Family Event', label: 'Family Event' },
+        { value: 'Other', label: 'Other' },
+      ] },
+    { name: 'guest_count', label: 'Guest Count', type: 'number' as const, placeholder: 'Number of guests', required: true },
+    { name: 'event_date', label: 'Event Date', type: 'date' as const, required: true },
+    { name: 'location', label: 'Venue/Location', type: 'text' as const, placeholder: 'Event venue or location', required: true },
+    { name: 'catering_style', label: 'Catering Style', type: 'select' as const, required: false, options: [
+        { value: 'Buffet', label: 'Buffet Service' },
+        { value: 'Plated', label: 'Plated Service' },
+        { value: 'Family Style', label: 'Family Style' },
+        { value: 'Cocktail Reception', label: 'Cocktail Reception' },
+        { value: 'Mixed', label: 'Mixed Service' },
+      ] },
+    { name: 'special_requirements', label: 'Special Requirements', type: 'textarea' as const, placeholder: 'Dietary restrictions, themes, ambiance preferences, or special requests', required: false },
+  ];
+
   return (
     <div className="bg-[#FFF8E7] text-[#1F1A12]">
       <CateringHero />
@@ -325,7 +325,7 @@ export default function CateringPage() {
               Share your event details and our premium catering team will craft a sophisticated proposal tailored to your vision.
             </p>
           </div>
-          <InquiryForm<CateringInquiry>
+          <InquiryForm
             title="Premium Catering Inquiry"
             description="Complete the catering request form and our hospitality team will follow up with a custom event proposal."
             schema={cateringInquirySchema}

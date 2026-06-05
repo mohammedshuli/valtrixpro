@@ -1,106 +1,125 @@
 import { motion } from 'framer-motion';
-import { courseRegistrationSchema } from '../lib/validationSchemas';
-import { submitCourseRegistration } from '../services/supabaseService';
-import InquiryForm from '../components/forms/InquiryForm';
+import CulinaryHero from '../components/culinary-experiences/CulinaryHero';
+import ExperienceTeaserCard from '../components/culinary-experiences/ExperienceTeaserCard';
+import CulinaryGallery from '../components/culinary-experiences/CulinaryGallery';
+import FutureLaunchCTA from '../components/culinary-experiences/FutureLaunchCTA';
+import aboutImage from '../assets/event.jpg';
+import teaserOne from '../assets/hero-hero.jpg';
+import teaserTwo from '../assets/menu.jpg';
+import teaserThree from '../assets/hero.png';
+
+const experienceCards = [
+  {
+    title: 'Private Cooking Sessions',
+    description: 'Intimate chef experiences designed for small groups and immersive kitchen storytelling.',
+    image: teaserOne,
+  },
+  {
+    title: 'Chef Masterclasses',
+    description: 'A preview of guided techniques, elevated mise en place, and refined culinary ritual.',
+    image: teaserTwo,
+  },
+  {
+    title: 'Gourmet Plating Workshops',
+    description: 'Explore elegant presentation, textural contrast, and modern plating philosophy.',
+    image: teaserThree,
+  },
+  {
+    title: 'Cultural Cuisine Experiences',
+    description: 'Discover meaningful food stories grounded in premium global ingredients.',
+    image: aboutImage,
+  },
+  {
+    title: 'Executive Culinary Experiences',
+    description: 'Sophisticated chef-led gatherings for discerning guests and private tastings.',
+    image: teaserOne,
+  },
+  {
+    title: 'Team Cooking Events',
+    description: 'Creative culinary collaboration for small teams and hospitality-minded groups.',
+    image: teaserTwo,
+  },
+];
 
 export default function CulinaryExperiencesPage() {
-  const courseFields = [
-    { name: 'name', label: 'Full Name', type: 'text' as const, placeholder: 'Your name', required: true },
-    { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@email.com', required: true },
-    { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
-    { name: 'course_name', label: 'Course Interest', type: 'select' as const, options: [
-      { value: 'fundamentals', label: 'Culinary Fundamentals' },
-      { value: 'advanced', label: 'Advanced Techniques' },
-      { value: 'tanzanian', label: 'Tanzanian Cuisine Masterclass' },
-      { value: 'pastry', label: 'Pastry & Desserts' },
-      { value: 'plating', label: 'Plating & Presentation' },
-      { value: 'wine', label: 'Wine & Food Pairing' },
-    ], required: true },
-    { name: 'experience_level', label: 'Experience Level', type: 'select' as const, options: [
-      { value: 'beginner', label: 'Beginner' },
-      { value: 'intermediate', label: 'Intermediate' },
-      { value: 'advanced', label: 'Advanced' },
-      { value: 'professional', label: 'Professional' },
-    ] },
-    { name: 'dietary_restrictions', label: 'Dietary Restrictions', type: 'textarea' as const, placeholder: 'Any allergies or restrictions we should know?' },
-    { name: 'guests', label: 'Number of Participants', type: 'number' as const },
-  ];
-
   return (
-    <div className="bg-[#FFF8E7]">
-      {/* Hero */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-white py-16 md:py-24"
-      >
-        <div className="section-container text-center">
-          <h1 className="text-5xl md:text-6xl font-playfair font-bold text-[#7A4A00] mb-6">
-            Culinary Masterclasses
-          </h1>
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Learn from executive chefs in immersive culinary experiences
-          </p>
-        </div>
-      </motion.section>
+    <div className="bg-[#FFF8E7] text-[#4d3a23]">
+      <CulinaryHero />
 
-      {/* Showcase */}
-      <section className="section">
+      <section className="py-16">
+        <div className="section-container grid gap-12 lg:grid-cols-[0.95fr_1.05fr] items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="space-y-6"
+          >
+            <p className="text-sm uppercase tracking-[0.35em] text-[#E6A520]">The Vision</p>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-[#7A4A00] leading-tight">
+              Culinary storytelling for a new generation of premium chef experiences.
+            </h2>
+            <p className="max-w-2xl text-lg leading-relaxed">
+              Valtrix Pro Chef is shaping an intimate studio of future culinary moments — where cuisine becomes exploration, skillful hospitality, and thoughtful artistry.
+            </p>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {[
+                'Crafted chef-led studio sessions',
+                'Warm cinematic kitchen atmospheres',
+                'Minimal, premium experience curation',
+                'Future-focused culinary storytelling',
+              ].map((item) => (
+                <div key={item} className="rounded-3xl border border-[#E6A520]/20 bg-white/80 p-6 shadow-[0_20px_40px_rgba(122,74,0,0.08)]">
+                  <p className="text-sm uppercase tracking-[0.25em] text-[#7A4A00] mb-3">{item.split(' ')[0]}</p>
+                  <p className="text-base text-[#4d3a23]">{item}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="overflow-hidden rounded-[2rem] shadow-[0_40px_90px_rgba(122,74,0,0.14)]"
+          >
+            <img
+              src={aboutImage}
+              alt="Warm culinary atmosphere"
+              className="h-full w-full object-cover min-h-[520px]"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section id="experience-types" className="py-16">
         <div className="section-container">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-6">
-                Hands-On Learning
-              </h2>
-              <ul className="space-y-4">
-                {[
-                  'Expert chef instruction',
-                  'Interactive cooking sessions',
-                  'Premium ingredients provided',
-                  'Small group sizes',
-                  'Take-home recipes',
-                  'Certificate of completion',
-                ].map((item, idx) => (
-                  <li key={idx} className="flex gap-3 items-start">
-                    <span className="text-[#E6A520] text-2xl">✓</span>
-                    <span className="text-gray-700 text-lg">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1556910103-1c02411297e3?w=600&h=600&fit=crop"
-                alt="Culinary Experience"
-                className="rounded-lg shadow-2xl"
+          <div className="space-y-6 text-center mb-12">
+            <p className="text-sm uppercase tracking-[0.35em] text-[#E6A520]">Upcoming Experience Types</p>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold text-[#7A4A00]">
+              A quiet glimpse at what’s coming next.
+            </h2>
+            <p className="mx-auto max-w-2xl text-base text-[#4d3a23] leading-relaxed">
+              These experiences are being crafted as elegant culinary journeys, not a full platform — designed to inspire curiosity and invite future discovery.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {experienceCards.map((experience) => (
+              <ExperienceTeaserCard
+                key={experience.title}
+                title={experience.title}
+                description={experience.description}
+                image={experience.image}
               />
-            </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Inquiry Form */}
-      <section className="section bg-white">
-        <div className="section-container">
-          <InquiryForm
-            title="Masterclass Registration"
-            description="Reserve your spot in an exclusive culinary experience"
-            schema={courseRegistrationSchema}
-            fields={courseFields}
-            submitButtonText="Register for Masterclass"
-            onSubmit={submitCourseRegistration}
-            successMessage="Thank you! We'll confirm your registration and course details soon."
-          />
-        </div>
-      </section>
+      <CulinaryGallery />
+      <FutureLaunchCTA />
     </div>
   );
 }

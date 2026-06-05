@@ -9,7 +9,7 @@ const serviceLinks: Record<string, string> = {
   'valtrix-fresh': ROUTES.MEAL_PREP,
   'culinary-experiences': ROUTES.CULINARY_EXPERIENCES,
   'chef-consultation': ROUTES.CHEF_CONSULTATION,
-  'catering-partnerships': ROUTES.CONTACT,
+  'catering-partnerships': ROUTES.CATERING_PARTNERSHIPS,
 };
 
 const serviceImages: Record<string, string> = {

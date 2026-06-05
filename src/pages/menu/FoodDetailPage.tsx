@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Star, Heart, ShoppingCart, MessageCircle, Clock, Users, Award, Share2 } from 'lucide-react';
@@ -180,14 +180,14 @@ export default function FoodDetailPage() {
                 <Clock className="w-5 h-5 text-[#E6A520]" />
                 <div>
                   <p className="text-sm text-gray-600">Prep Time</p>
-                  <p className="font-semibold">{(foodItem as any).prepTime || '15-20 mins'}</p>
+                  <p className="font-semibold">15-20 mins</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-[#E6A520]" />
                 <div>
                   <p className="text-sm text-gray-600">Serves</p>
-                  <p className="font-semibold">{(foodItem as any).serves || '1-2 people'}</p>
+                  <p className="font-semibold">1-2 people</p>
                 </div>
               </div>
             </div>
@@ -196,7 +196,7 @@ export default function FoodDetailPage() {
             <div>
               <h3 className="text-lg font-semibold text-[#7A4A00] mb-2">Key Ingredients</h3>
               <div className="flex flex-wrap gap-2">
-                {(foodItem as any).ingredients || ['Premium Ingredients', 'Fresh Herbs', 'Quality Spices', 'Local Produce', 'Artisanal Seasonings'].map((ingredient: string) => (
+                {['Premium Ingredients', 'Fresh Herbs', 'Quality Spices', 'Local Produce', 'Artisanal Seasonings'].map((ingredient: string) => (
                   <span
                     key={ingredient}
                     className="bg-[#FFD77A]/20 text-[#7A4A00] px-3 py-1 rounded-full text-sm"

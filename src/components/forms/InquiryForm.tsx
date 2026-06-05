@@ -1,55 +1,93 @@
-import { useForm, type Path } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { ZodSchema } from 'zod';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useForm, type FieldErrors, type FieldValues, type Path, type SubmitHandler } from 'react-hook-form';
+import type { ZodTypeAny, infer as zInfer } from 'zod';
+import { UI_CONSTANTS } from '../../lib/constants';
 
-interface InquiryFormProps<T> {
+type InquiryInputType = 'text' | 'email' | 'phone' | 'date' | 'number' | 'select' | 'textarea';
+
+export type InquiryFieldConfig = {
+  name: string;
+  label: string;
+  type: InquiryInputType;
+  placeholder?: string;
+  required?: boolean;
+  options?: Array<{ value: string; label: string }>;
+};
+
+export type InquiryFormProps<T extends ZodTypeAny> = {
   title: string;
   description: string;
-  schema: ZodSchema;
-  fields: Array<{
-    name: string;
-    label: string;
-    type: 'text' | 'email' | 'phone' | 'date' | 'number' | 'select' | 'textarea';
-    placeholder?: string;
-    required?: boolean;
-    options?: Array<{ value: string; label: string }>;
-  }>;
+  schema: T;
+  fields: Array<InquiryFieldConfig>;
   submitButtonText?: string;
-  onSubmit: (data: T) => Promise<void>;
+  onSubmit: (data: zInfer<T>) => Promise<void>;
   successMessage?: string;
+};
+
+function getErrorMessage<FormData extends FieldValues>(errors: FieldErrors<FormData>, name: Path<FormData>): string | undefined {
+  const field = errors[name];
+  const message = field?.message;
+  return typeof message === 'string' ? message : undefined;
 }
 
-export default function InquiryForm<T extends Record<string, unknown>>({
+export default function InquiryForm<T extends ZodTypeAny>({
   title,
   description,
   schema,
   fields,
   submitButtonText = 'Submit Inquiry',
   onSubmit,
-  successMessage = 'Thank you! We\'ll be in touch soon.',
+  successMessage = "Thank you! We'll be in touch soon.",
 }: InquiryFormProps<T>) {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const timeoutRefs = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(clearTimeout);
+      timeoutRefs.current = [];
+    };
+  }, []);
+
+  type FormData = zInfer<T> extends FieldValues ? zInfer<T> : FieldValues;
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<T>({
-    resolver: zodResolver(schema),
+  } = useForm<FormData>({
+    resolver: zodResolver(schema as any) as any,
   });
 
-  const onSubmitForm = async (data: T) => {
+  const clearPendingTimers = () => {
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
+  };
+
+  const onSubmitForm: SubmitHandler<FormData> = async (data) => {
     try {
+      clearPendingTimers();
       setSubmitStatus('loading');
       setErrorMessage('');
-      await onSubmit(data);
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        const timerId = window.setTimeout(
+          () => reject(new Error('Request timed out. Please try again.')),
+          UI_CONSTANTS.FORM_SUBMISSION_TIMEOUT
+        );
+        timeoutRefs.current.push(timerId);
+      });
+
+      await Promise.race([onSubmit(data as zInfer<T>), timeoutPromise]);
+
       setSubmitStatus('success');
       reset();
-      setTimeout(() => setSubmitStatus('idle'), 5000);
+      const completeTimer = window.setTimeout(() => setSubmitStatus('idle'), UI_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);
+      timeoutRefs.current.push(completeTimer);
     } catch (error) {
       setSubmitStatus('error');
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
@@ -63,12 +101,8 @@ export default function InquiryForm<T extends Record<string, unknown>>({
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-lg shadow-lg p-8 md:p-12"
       >
-        <h2 className="text-3xl font-playfair font-bold text-[#7A4A00] mb-3">
-          {title}
-        </h2>
-        <p className="text-gray-700 mb-8">
-          {description}
-        </p>
+        <h2 className="text-3xl font-playfair font-bold text-[#7A4A00] mb-3">{title}</h2>
+        <p className="text-gray-700 mb-8">{description}</p>
 
         {submitStatus === 'success' && (
           <motion.div
@@ -93,47 +127,74 @@ export default function InquiryForm<T extends Record<string, unknown>>({
         )}
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
-          {fields.map((field) => (
-            <div key={field.name}>
-              <label className="block text-lg font-semibold text-[#7A4A00] mb-2">
-                {field.label}
-                {field.required !== false && <span className="text-red-500">*</span>}
-              </label>
+          {fields.map((field) => {
+            const fieldName = field.name as Path<FormData>;
+            const fieldError = getErrorMessage(errors, fieldName);
 
-              {field.type === 'textarea' ? (
-                <textarea
-                  {...register(field.name as Path<T>)}
-                  placeholder={field.placeholder}
-                  className="textarea-base h-32"
-                />
-              ) : field.type === 'select' ? (
-                <select
-                  {...register(field.name as Path<T>)}
-                  className="select-base"
-                >
-                  <option value="">Select an option</option>
-                  {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
+            if (field.type === 'textarea') {
+              return (
+                <div key={field.name}>
+                  <label className="block text-lg font-semibold text-[#7A4A00] mb-2">
+                    {field.label}
+                    {field.required !== false && <span className="text-red-500">*</span>}
+                  </label>
+
+                  <textarea
+                    {...register(fieldName)}
+                    placeholder={field.placeholder}
+                    className="textarea-base h-32"
+                  />
+
+                  {fieldError && <p className="text-red-600 text-sm mt-2">{fieldError}</p>}
+                </div>
+              );
+            }
+
+            if (field.type === 'select') {
+              return (
+                <div key={field.name}>
+                  <label className="block text-lg font-semibold text-[#7A4A00] mb-2">
+                    {field.label}
+                    {field.required !== false && <span className="text-red-500">*</span>}
+                  </label>
+
+                  <select {...register(fieldName)} className="select-base">
+                    <option value="">Select an option</option>
+                    {field.options?.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+
+                  {fieldError && <p className="text-red-600 text-sm mt-2">{fieldError}</p>}
+                </div>
+              );
+            }
+
+            const registerReturn =
+              field.type === 'number'
+                ? register(fieldName, { valueAsNumber: true })
+                : register(fieldName);
+
+            return (
+              <div key={field.name}>
+                <label className="block text-lg font-semibold text-[#7A4A00] mb-2">
+                  {field.label}
+                  {field.required !== false && <span className="text-red-500">*</span>}
+                </label>
+
                 <input
-                  {...register(field.name as Path<T>)}
+                  {...registerReturn}
                   type={field.type}
                   placeholder={field.placeholder}
                   className="input-base"
                 />
-              )}
 
-              {errors[field.name] && (
-                <p className="text-red-600 text-sm mt-2">
-                  {String(errors[field.name]?.message)}
-                </p>
-              )}
-            </div>
-          ))}
+                {fieldError && <p className="text-red-600 text-sm mt-2">{fieldError}</p>}
+              </div>
+            );
+          })}
 
           <motion.button
             type="submit"

@@ -1,13 +1,10 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { ROUTES } from '../lib/constants';
 import InquiryForm from '../components/forms/InquiryForm';
 import ChefHero from '../components/private-chef/ChefHero';
 import ExperienceCard from '../components/private-chef/ExperienceCard';
 import FeatureHighlight from '../components/private-chef/FeatureHighlight';
 import LuxuryGallery from '../components/private-chef/LuxuryGallery';
 import TestimonialCard from '../components/private-chef/TestimonialCard';
-import { privateChefInquirySchema, type PrivateChefInquiry } from '../lib/validationSchemas';
+import { privateChefInquirySchema } from '../lib/validationSchemas';
 import { submitPrivateChefInquiry } from '../services/supabaseService';
 import experienceOne from '../assets/event.jpg';
 import experienceTwo from '../assets/menu.jpg';
@@ -223,7 +220,7 @@ export default function PrivateChefPage() {
               Share your event details and our team will craft a refined proposal for your luxury dining moment.
             </p>
           </div>
-          <InquiryForm<PrivateChefInquiry>
+          <InquiryForm
             title="Request Private Chef Experience"
             description="Complete the booking request and our concierge team will follow up with a custom proposal."
             schema={privateChefInquirySchema}

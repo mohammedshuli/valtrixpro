@@ -2,6 +2,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import AdminSidebar from '../components/admin/AdminSidebar';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -40,11 +41,13 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8E7] flex">
-      <AdminSidebar />
-      <main className="flex-grow">
-        <Outlet />
-      </main>
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-[#FFF8E7] flex">
+        <AdminSidebar />
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+      </div>
+    </ErrorBoundary>
   );
 }

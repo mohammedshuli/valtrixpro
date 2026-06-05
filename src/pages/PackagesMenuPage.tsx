@@ -27,7 +27,7 @@ export default function PackagesMenuPage() {
 
   // Get featured food items
   const featuredFoodItems = useMemo(() => {
-    return FOOD_MENU_ITEMS.filter(item => FEATURED_FOODS.includes(item.id as any));
+    return FOOD_MENU_ITEMS.filter(item => FEATURED_FOODS.includes(item.id));
   }, []);
 
   const addToCart = (itemId: string) => {

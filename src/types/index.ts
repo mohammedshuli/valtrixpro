@@ -1,6 +1,15 @@
 export type UserRole = 'admin' | 'guest';
 export type InquiryStatus = 'pending' | 'contacted' | 'confirmed' | 'completed';
 export type ServiceType = 'catering' | 'corporate_events' | 'meal_prep' | 'consultation' | 'masterclass' | 'general_contact';
+export type InquiryType =
+  | 'catering'
+  | 'corporate'
+  | 'meal'
+  | 'consultation'
+  | 'privateChef'
+  | 'course'
+  | 'contact'
+  | 'fresh';
 
 export interface Admin {
   id: string;
@@ -9,89 +18,71 @@ export interface Admin {
   created_at: string;
 }
 
-export interface CateringBooking {
+export interface InquiryBase {
   id: string;
-  name: string;
   email: string;
   phone: string;
-  event_date: string;
-  guest_count: number;
-  budget: string;
-  special_requirements: string;
   status: InquiryStatus;
   created_at: string;
   updated_at: string;
 }
 
-export interface CorporateEvent {
-  id: string;
+export interface CateringBooking extends InquiryBase {
+  name: string;
+  event_date: string;
+  guest_count: number;
+  budget: string;
+  special_requirements: string;
+}
+
+export interface CorporateEvent extends InquiryBase {
   company_name: string;
   contact_name: string;
-  email: string;
-  phone: string;
   event_type: string;
   event_date: string;
   guest_count: number;
   budget: string;
   requirements: string;
-  status: InquiryStatus;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface MealInquiry {
-  id: string;
+export interface MealInquiry extends InquiryBase {
   name: string;
-  email: string;
-  phone: string;
   meal_type: string;
   delivery_frequency: string;
   dietary_requirements: string;
   quantity: number;
-  status: InquiryStatus;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Consultation {
-  id: string;
+export interface Consultation extends InquiryBase {
   name: string;
-  email: string;
-  phone: string;
   consultation_type: string;
   available_dates: string;
   budget: string;
   requirements: string;
-  status: InquiryStatus;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface CourseRegistration {
-  id: string;
+export interface CourseRegistration extends InquiryBase {
   name: string;
-  email: string;
-  phone: string;
   course_name: string;
   experience_level: string;
   dietary_restrictions: string;
   guests: number;
-  status: InquiryStatus;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface ContactMessage {
-  id: string;
+export interface ContactMessage extends InquiryBase {
   name: string;
-  email: string;
-  phone: string;
   subject: string;
   message: string;
-  status: InquiryStatus;
-  created_at: string;
-  updated_at: string;
 }
+
+export type Inquiry =
+  | (CateringBooking & { type: 'catering' })
+  | (CorporateEvent & { type: 'corporate' })
+  | (MealInquiry & { type: 'meal' })
+  | (Consultation & { type: 'consultation' })
+  | (CourseRegistration & { type: 'course' })
+  | (ContactMessage & { type: 'contact' })
+  | (MealInquiry & { type: 'fresh' });
 
 export interface Service {
   id: string;
