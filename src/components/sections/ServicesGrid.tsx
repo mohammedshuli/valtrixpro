@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../../lib/constants';
+import privateChefImage from '../../assets/privateChef.png';
+import cateringImage from '../../assets/catering.jpg';
+import corporateImage from '../../assets/coporate.jpg';
+import freshImage from '../../assets/valtrixfresh.png';
+import culinaryImage from '../../assets/culinaryExperience.png';
+import consultationImage from '../../assets/consultation.png';
+import partnershipImage from '../../assets/partnership.jpg';
 
 const serviceLinks: Record<string, string> = {
   'private-chef-experiences': ROUTES.PRIVATE_CHEF,
@@ -13,13 +20,13 @@ const serviceLinks: Record<string, string> = {
 };
 
 const serviceImages: Record<string, string> = {
-  'private-chef-experiences': 'https://images.unsplash.com/photo-1556910103-1c02411297e3?w=600&h=600&fit=crop',
-  'premium-catering': 'https://images.unsplash.com/photo-1555939594-58d7cb561484?w=600&h=600&fit=crop',
-  'corporate-events': 'https://images.unsplash.com/photo-1519167758993-41d2f9c991cc?w=600&h=600&fit=crop',
-  'valtrix-fresh': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=600&fit=crop',
-  'culinary-experiences': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop',
-  'chef-consultation': 'https://images.unsplash.com/photo-1507668077129-56e32842fcaf?w=600&h=600&fit=crop',
-  'catering-partnerships': 'https://images.unsplash.com/photo-1552566626-52f8b29e6e80?w=600&h=600&fit=crop',
+  'private-chef-experiences': privateChefImage,
+  'premium-catering': cateringImage,
+  'corporate-events': corporateImage,
+  'valtrix-fresh': freshImage,
+  'culinary-experiences': culinaryImage,
+  'chef-consultation': consultationImage,
+  'catering-partnerships': partnershipImage,
 };
 
 import { SERVICES } from '../../lib/constants';

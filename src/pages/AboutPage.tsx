@@ -1,12 +1,21 @@
 import { motion } from 'framer-motion';
 import { ROUTES } from '../lib/constants';
 import { Link } from 'react-router-dom';
+import musa from '../assets/musa.jpg';
+import sule from '../assets/sule.png';
+import mo from '../assets/mo.png';
+import kassim from '../assets/kassim.png';
+import shuli from '../assets/shuli.png';
+import hemed from '../assets/hemed.png';
 
 export default function AboutPage() {
   const teamMembers = [
-    { name: 'Chef Micheal Mwase', role: 'Executive Chef & Founder', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop' },
-    { name: 'Sarah Kikwete', role: 'Head of Events', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop' },
-    { name: 'James Ndaki', role: 'Culinary Director', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop' },
+    { name: 'Chef Mussa Abdalla', role: 'Founder and CEO', image: musa },
+    { name: 'Chef Suleyman', role: 'Head of Events', image: sule },
+    { name: 'Chef Mohammed Noty', role: 'Culinary Director', image: mo },
+    { name: 'Kassim Abdallah', role: 'Executive Chef', image: kassim },
+    { name: 'Mohammed Shuli', role: 'Sous Chef', image: shuli },
+    { name: 'Ahmed Notty', role: 'Chef de Partie', image: hemed },
   ];
 
   return (
