@@ -58,7 +58,6 @@ const buildFallbackServices = (): UiService[] =>
 
 export default function ServicesGrid() {
   const [services, setServices] = useState<UiService[]>(buildFallbackServices());
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -84,11 +83,6 @@ export default function ServicesGrid() {
       })
       .catch(() => {
         // Keep fallback services if fetching fails
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
       });
 
     return () => {
