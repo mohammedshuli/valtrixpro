@@ -93,6 +93,8 @@ export interface Service {
   icon: string;
   image_url: string;
   features: string[];
+  is_active?: boolean;
+  display_order?: number;
   created_at: string;
   updated_at: string;
 }
