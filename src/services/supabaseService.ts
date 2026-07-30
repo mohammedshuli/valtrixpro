@@ -206,14 +206,16 @@ export const updateInquiryStatus = async (
 };
 
 // Services
-export const fetchServices = async () => {
+export const fetchServices = async (): Promise<types.Service[]> => {
   const { data, error } = await supabase
     .from('services')
     .select('*')
-    .order('name');
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+    .order('name', { ascending: true });
 
   if (error) throw new Error(error.message);
-  return data || [];
+  return (data as types.Service[]) || [];
 };
 
 // Testimonials

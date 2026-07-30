@@ -13,6 +13,8 @@ import ValtrixFreshPage from '../pages/ValtrixFreshPage';
 import CulinaryExperiencesPage from '../pages/CulinaryExperiencesPage';
 import PrivateChefPage from '../pages/PrivateChefPage';
 import ChefConsultationPage from '../pages/ChefConsultationPage';
+import ValtrixStudioPage from '../pages/ValtrixStudioPage';
+import EquipmentRentalPage from '../pages/EquipmentRentalPage';
 import GalleryPage from '../pages/GalleryPage';
 import ContactPage from '../pages/ContactPage';
 import FoodDetailPage from '../pages/menu/FoodDetailPage';
@@ -54,6 +56,8 @@ function App() {
             <Route path="/private-chef-experiences" element={<PrivateChefPage />} />
             <Route path="/culinary-experiences" element={<CulinaryExperiencesPage />} />
             <Route path="/chef-consultation" element={<ChefConsultationPage />} />
+            <Route path="/valtrix-studio" element={<ValtrixStudioPage />} />
+            <Route path="/equipment-rental" element={<EquipmentRentalPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Route>

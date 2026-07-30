@@ -21,7 +21,7 @@ export default function ServicesPage() {
             Our Services
           </h1>
           <p className="text-xl text-white max-w-2xl mx-auto">
-            Seven premium culinary and hospitality services designed to exceed expectations
+            Nine premium culinary and hospitality services designed to exceed expectations
           </p>
         </div>
       </motion.section>

@@ -57,6 +57,20 @@ export const SERVICES = [
     shortDescription: 'Strategic collaborations for hospitality',
     description: 'Long-term partnerships with hotels, venues, and establishments seeking premium culinary operations and F&B management.',
   },
+  {
+    id: 'valtrix-studio',
+    name: 'Valtrix Studio',
+    slug: 'valtrix-studio',
+    shortDescription: 'Mobile culinary activations and training',
+    description: 'Live mobile kitchen experiences for food sales, competitions, workshops, and chef-led demonstrations designed to engage communities and event audiences.',
+  },
+  {
+    id: 'equipment-rental',
+    name: 'Equipment Rental',
+    slug: 'equipment-rental',
+    shortDescription: 'Professional event and catering gear',
+    description: 'Rent chafing dishes, buffet setups, tables, chairs, kitchen equipment, serving utensils, and catering accessories for seamless event execution.',
+  },
 ] as const;
 
 // Catering Packages
@@ -337,6 +351,8 @@ export const ROUTES = {
   MEAL_PREP: '/valtrix-fresh',
   CULINARY_EXPERIENCES: '/culinary-experiences',
   CHEF_CONSULTATION: '/chef-consultation',
+  VALTRIX_STUDIO: '/valtrix-studio',
+  EQUIPMENT_RENTAL: '/equipment-rental',
   GALLERY: '/gallery',
   CONTACT: '/contact',
   ADMIN: '/admin',
