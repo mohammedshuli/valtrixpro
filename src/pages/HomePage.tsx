@@ -1,11 +1,51 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ROUTES, MOCK_TESTIMONIALS } from '../lib/constants';
+import { useEffect, useState } from 'react';
+import { ROUTES } from '../lib/constants';
+import { supabase } from '../lib/supabase';
 import ServicesGrid from '../components/sections/ServicesGrid';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
 import heroBackground from '../assets/hero-hero.jpg';
 
+const galleryImages = [
+  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=600&fit=crop',
+];
+
+type Testimonial = {
+  id: string;
+  name?: string;
+  role?: string;
+  content?: string;
+  clientName?: string;
+  clientTitle?: string;
+  message?: string;
+  rating?: number;
+};
+
 export default function HomePage() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      const { data, error } = await supabase
+        .from('testimonials')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(6);
+
+      if (!error && data && data.length > 0) {
+        setTestimonials(data);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -25,16 +65,12 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#FFF8E7]">
-      {/* Hero Section */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative h-[70vh] md:h-[90vh] bg-cover bg-center flex items-center justify-center"
-        style={{
-          backgroundImage: `url(${heroBackground})`,
-          backgroundAttachment: 'fixed',
-        }}
+        className="relative h-[85vh] md:h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
+        style={{ backgroundImage: `url(${heroBackground})` }}
       >
         <div className="absolute inset-0 bg-black/55"></div>
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
@@ -63,14 +99,16 @@ export default function HomePage() {
             <Link to={ROUTES.CONTACT} className="btn-primary text-lg">
               Inquire Now
             </Link>
-            <Link to={ROUTES.SERVICES} className="btn-secondary text-lg bg-white/20 border-white text-white hover:bg-white/30">
+            <Link
+              to={ROUTES.SERVICES}
+              className="btn-secondary text-lg bg-white/20 border-white text-white hover:bg-white/30"
+            >
               Explore Services
             </Link>
           </motion.div>
         </div>
       </motion.section>
 
-      {/* Services Overview */}
       <section className="section bg-[#FFF8E7]">
         <div className="section-container">
           <motion.div
@@ -91,7 +129,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Signature Experience */}
       <section className="section bg-white">
         <div className="section-container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -101,11 +138,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=600&fit=crop"
-                alt="Signature Experience"
-                className="rounded-lg shadow-2xl"
-              />
+              <img src="/src/assets/hero.png" alt="Signature Experience" className="rounded-lg shadow-2xl" />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -140,29 +173,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Corporate Focus */}
       <section className="section bg-[#FFF8E7]">
         <div className="section-container">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-xl shadow-xl p-12 md:p-16 text-center"
-          >
-            <h2 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-6">
-              Elevate Your Corporate Events
-            </h2>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
-              Make lasting impressions with sophisticated culinary excellence. Our corporate catering service is designed for leaders who demand premium quality.
-            </p>
-            <Link to={ROUTES.CORPORATE_EVENTS} className="btn-primary">
-              Explore Corporate Services
-            </Link>
-          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative h-72 md:h-full min-h-[380px]"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop"
+                alt="Corporate Events"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="bg-[#7A4A00] p-10 md:p-14 flex flex-col justify-center"
+            >
+              <span className="text-[#FFD77A] text-sm font-semibold tracking-widest uppercase mb-4">
+                Corporate & Events
+              </span>
+              <h2 className="text-4xl font-playfair font-bold text-white mb-6 leading-tight">
+                Elevate Your Corporate Events
+              </h2>
+              <p className="text-white/80 text-lg mb-8">
+                Make lasting impressions with sophisticated culinary excellence.
+                Designed for leaders who demand premium quality.
+              </p>
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                {[
+                  { value: '50+', label: 'Events Delivered' },
+                  { value: '500+', label: 'Guests Served' },
+                  { value: '100%', label: 'Satisfaction' },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <p className="text-3xl font-playfair font-bold text-[#FFD77A]">{stat.value}</p>
+                    <p className="text-white/70 text-xs mt-1">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+              <Link to={ROUTES.CORPORATE_EVENTS} className="btn-primary self-start">
+                Explore Corporate Services
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Valtrix Fresh Highlight */}
       <section className="section bg-white">
         <div className="section-container">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -198,7 +262,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
       <section className="section bg-[#FFF8E7]">
         <div className="section-container">
           <motion.div
@@ -212,11 +275,10 @@ export default function HomePage() {
               What Our Clients Say
             </motion.h2>
           </motion.div>
-          <TestimonialsSection testimonials={MOCK_TESTIMONIALS} />
+          <TestimonialsSection testimonials={testimonials} />
         </div>
       </section>
 
-      {/* Gallery Preview */}
       <section className="section bg-white">
         <div className="section-container">
           <motion.div
@@ -234,7 +296,7 @@ export default function HomePage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {galleryImages.map((src, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -244,9 +306,10 @@ export default function HomePage() {
                 className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
               >
                 <img
-                  src={`https://images.unsplash.com/photo-${1559521713 + i}?w=400&h=400&fit=crop`}
-                  alt={`Gallery ${i}`}
+                  src={src}
+                  alt={`Gallery ${i + 1}`}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
                 />
               </motion.div>
             ))}
@@ -257,39 +320,6 @@ export default function HomePage() {
               View Full Gallery
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="section bg-[#7A4A00] text-white">
-        <div className="section-container text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-playfair font-bold mb-6"
-          >
-            Ready to Experience Excellence?
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-xl mb-8 max-w-2xl mx-auto"
-          >
-            Let's create something extraordinary together
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            <Link to={ROUTES.CONTACT} className="btn-secondary text-white border-white hover:bg-white hover:text-[#7A4A00]">
-              Start Your Journey
-            </Link>
-          </motion.div>
         </div>
       </section>
     </div>

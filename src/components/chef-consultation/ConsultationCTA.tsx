@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { FormEvent, useState } from 'react';
 import { consultationSchema } from '../../lib/validationSchemas';
 import { submitConsultationRequest } from '../../services/supabaseService';
 import InquiryForm from '../forms/InquiryForm';

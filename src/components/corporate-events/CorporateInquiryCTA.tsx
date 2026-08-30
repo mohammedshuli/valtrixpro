@@ -1,29 +1,29 @@
 import { motion } from 'framer-motion';
 import InquiryForm from '../forms/InquiryForm';
-import { corporateEventSchema } from '../../lib/validationSchemas';
+import { corporateEventSchema, type CorporateEvent } from '../../lib/validationSchemas';
 import { submitCorporateEventInquiry } from '../../services/supabaseService';
 
-export default function CorporateInquiryCTA() {
-  const corporateFields = [
-    { name: 'company_name', label: 'Company Name', type: 'text' as const, placeholder: 'Your company name', required: true },
-    { name: 'contact_name', label: 'Contact Person', type: 'text' as const, placeholder: 'Your full name', required: true },
-    { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@company.com', required: true },
-    { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
-    { name: 'event_type', label: 'Event Type', type: 'select' as const, required: true, options: [
-        { value: 'Executive Conference', label: 'Executive Conference' },
-        { value: 'Corporate Networking', label: 'Corporate Networking' },
-        { value: 'Product Launch', label: 'Product Launch' },
-        { value: 'VIP Dinner', label: 'VIP Corporate Dinner' },
-        { value: 'Team Building', label: 'Team Building Event' },
-        { value: 'Awards Ceremony', label: 'Awards Ceremony' },
-        { value: 'Board Meeting', label: 'Board Meeting' },
-        { value: 'Other', label: 'Other' },
-      ] },
-    { name: 'guest_count', label: 'Expected Attendees', type: 'number' as const, placeholder: 'Number of guests', required: true },
-    { name: 'event_date', label: 'Event Date', type: 'date' as const, required: true },
-    { name: 'requirements', label: 'Special Requirements', type: 'textarea' as const, placeholder: 'Dietary requirements, venue details, theme preferences, or special requests', required: false },
-  ];
+const corporateFields = [
+  { name: 'company_name', label: 'Company Name', type: 'text' as const, placeholder: 'Your company name', required: true },
+  { name: 'contact_name', label: 'Contact Person', type: 'text' as const, placeholder: 'Your full name', required: true },
+  { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@company.com', required: true },
+  { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
+  { name: 'event_type', label: 'Event Type', type: 'select' as const, required: true, options: [
+      { value: 'Executive Conference', label: 'Executive Conference' },
+      { value: 'Corporate Networking', label: 'Corporate Networking' },
+      { value: 'Product Launch', label: 'Product Launch' },
+      { value: 'VIP Dinner', label: 'VIP Corporate Dinner' },
+      { value: 'Team Building', label: 'Team Building Event' },
+      { value: 'Awards Ceremony', label: 'Awards Ceremony' },
+      { value: 'Board Meeting', label: 'Board Meeting' },
+      { value: 'Other', label: 'Other' },
+    ] },
+  { name: 'guest_count', label: 'Expected Attendees', type: 'number' as const, placeholder: 'Number of guests', required: true },
+  { name: 'event_date', label: 'Event Date', type: 'date' as const, required: true },
+  { name: 'requirements', label: 'Special Requirements', type: 'textarea' as const, placeholder: 'Dietary requirements, venue details, theme preferences, or special requests', required: false },
+];
 
+export default function CorporateInquiryCTA() {
   return (
     <section id="inquiry" className="py-32 bg-[#FFF8E7]">
       <div className="section-container">
@@ -100,7 +100,7 @@ export default function CorporateInquiryCTA() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
           >
-            <InquiryForm
+            <InquiryForm<CorporateEvent>
               title="Corporate Event Inquiry"
               description="Tell us about your corporate event and we'll create a premium hospitality proposal."
               schema={corporateEventSchema}

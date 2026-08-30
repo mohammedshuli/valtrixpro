@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '../../lib/constants';
 import executiveEvent from '../../assets/event.jpg';
 
 export default function ExecutiveHero() {

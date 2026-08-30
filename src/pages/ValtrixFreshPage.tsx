@@ -4,7 +4,7 @@ import ProductCard from '../components/valtrix-fresh/ProductCard';
 import FreshGallery from '../components/valtrix-fresh/FreshGallery';
 import WellnessBenefits from '../components/valtrix-fresh/WellnessBenefits';
 import InquiryForm from '../components/forms/InquiryForm';
-import { freshInquirySchema } from '../lib/validationSchemas';
+import { freshInquirySchema, type FreshInquiry } from '../lib/validationSchemas';
 import { submitFreshInquiry } from '../services/supabaseService';
 import freshOne from '../assets/menu.jpg';
 import freshTwo from '../assets/event.jpg';
@@ -221,7 +221,7 @@ export default function ValtrixFreshPage() {
             </p>
           </div>
 
-          <InquiryForm
+          <InquiryForm<FreshInquiry>
             title="Fresh Food Inquiry"
             description="Complete this quick form to request premium fresh meals, juices, or wellness packages."
             schema={freshInquirySchema}

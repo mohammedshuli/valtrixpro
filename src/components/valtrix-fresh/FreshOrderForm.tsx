@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Textarea } from '../ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 const freshInquirySchema = z.object({
   name: z.string().min(2, 'Name is required'),
@@ -28,6 +32,8 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<FreshInquiry>({
     resolver: zodResolver(freshInquirySchema),
   });
@@ -37,7 +43,7 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
     try {
       await onSubmit(data);
       setSubmitMessage('Thank you! We\'ll contact you soon about your fresh experience.');
-    } catch {
+    } catch (error) {
       setSubmitMessage('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -64,10 +70,10 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
       <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <input
+            <Input
               {...register('name')}
               placeholder="Your full name"
-              className="input-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
+              className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
@@ -75,10 +81,10 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
           </div>
 
           <div>
-            <input
+            <Input
               {...register('phone')}
               placeholder="Phone number"
-              className="input-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
+              className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
             />
             {errors.phone && (
               <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
@@ -87,11 +93,11 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
         </div>
 
         <div>
-          <input
+          <Input
             {...register('email')}
             type="email"
             placeholder="Email address"
-            className="input-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
+            className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
           />
           {errors.email && (
             <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
@@ -99,28 +105,29 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
         </div>
 
         <div>
-          <select
-            {...register('product_interest')}
-            className="select-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
-          >
-            <option value="">What interests you most?</option>
-            <option value="juices">Fresh Juices</option>
-            <option value="salads">Healthy Salads</option>
-            <option value="smoothies">Smoothies</option>
-            <option value="meal-plans">Meal Plans</option>
-            <option value="detox">Detox Programs</option>
-            <option value="breakfast">Healthy Breakfast</option>
-          </select>
+          <Select onValueChange={(value) => setValue('product_interest', value)}>
+            <SelectTrigger className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl">
+              <SelectValue placeholder="What interests you most?" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="juices">Fresh Juices</SelectItem>
+              <SelectItem value="salads">Healthy Salads</SelectItem>
+              <SelectItem value="smoothies">Smoothies</SelectItem>
+              <SelectItem value="meal-plans">Meal Plans</SelectItem>
+              <SelectItem value="detox">Detox Programs</SelectItem>
+              <SelectItem value="breakfast">Healthy Breakfast</SelectItem>
+            </SelectContent>
+          </Select>
           {errors.product_interest && (
             <p className="text-red-500 text-sm mt-1">{errors.product_interest.message}</p>
           )}
         </div>
 
         <div>
-          <input
+          <Input
             {...register('delivery_location')}
             placeholder="Delivery location"
-            className="input-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
+            className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
           />
           {errors.delivery_location && (
             <p className="text-red-500 text-sm mt-1">{errors.delivery_location.message}</p>
@@ -128,43 +135,45 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
         </div>
 
         <div>
-          <select
-            {...register('preferred_plan')}
-            className="select-base h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl"
-          >
-            <option value="">Preferred plan (optional)</option>
-            <option value="daily">Daily Fresh Delivery</option>
-            <option value="weekly">Weekly Meal Plan</option>
-            <option value="monthly">Monthly Subscription</option>
-            <option value="office">Office Meal Plan</option>
-            <option value="detox">Detox Program</option>
-          </select>
+          <Select onValueChange={(value) => setValue('preferred_plan', value)}>
+            <SelectTrigger className="h-12 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl">
+              <SelectValue placeholder="Preferred plan (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Daily Fresh Delivery</SelectItem>
+              <SelectItem value="weekly">Weekly Meal Plan</SelectItem>
+              <SelectItem value="monthly">Monthly Subscription</SelectItem>
+              <SelectItem value="office">Office Meal Plan</SelectItem>
+              <SelectItem value="detox">Detox Program</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>
-          <textarea
+          <Textarea
             {...register('notes')}
             placeholder="Any special dietary requirements or preferences?"
-            className="textarea-base min-h-24 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl resize-none"
+            className="min-h-24 border-[#E6A520]/30 focus:border-[#E6A520] rounded-xl resize-none"
           />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="btn-primary flex-1 h-12"
+            className="flex-1 h-12 bg-[#E6A520] hover:bg-[#7A4A00] text-white font-semibold rounded-xl"
           >
             {isSubmitting ? 'Submitting...' : 'Start Fresh Experience'}
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
-            className="btn-outline flex-1 h-12"
+            variant="outline"
+            className="flex-1 h-12 border-[#E6A520] text-[#E6A520] hover:bg-[#E6A520] hover:text-white font-semibold rounded-xl"
             onClick={() => window.open('https://wa.me/255123456789', '_blank')}
           >
             Order via WhatsApp
-          </button>
+          </Button>
         </div>
 
         {submitMessage && (

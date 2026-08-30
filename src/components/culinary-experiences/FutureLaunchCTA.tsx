@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { type FormEvent, useState } from 'react';
+import { FormEvent, useState } from 'react';
 
 export default function FutureLaunchCTA() {
   const [email, setEmail] = useState('');

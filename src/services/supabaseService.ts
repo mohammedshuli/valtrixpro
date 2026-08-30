@@ -1,194 +1,203 @@
 import { supabase } from '../lib/supabase';
-import { AppError } from '../lib/errorHandler';
-import { UI_CONSTANTS } from '../lib/constants';
 import * as types from '../types';
 import * as schemas from '../lib/validationSchemas';
 
-type InquirySubmitType =
-  | 'catering'
-  | 'corporate'
-  | 'meal'
-  | 'consultation'
-  | 'privateChef'
-  | 'course'
-  | 'contact'
-  | 'fresh';
-
-interface InquiryAdapter {
-  table: string;
-  transform?: (data: Record<string, unknown>) => Record<string, unknown>;
-}
-
-const inquiryAdapters: Record<InquirySubmitType, InquiryAdapter> = {
-  catering: {
-    table: 'bookings',
-  },
-  corporate: {
-    table: 'corporate_events',
-  },
-  meal: {
-    table: 'meal_inquiries',
-  },
-  consultation: {
-    table: 'consultations',
-  },
-  privateChef: {
-    table: 'consultations',
-    transform: (data) => ({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      consultation_type: data.event_type,
-      available_dates: data.preferred_date,
-      budget: null,
-      requirements: `Location: ${data.location}${data.special_requests ? `\nSpecial Requests: ${data.special_requests}` : ''}`,
-      status: 'pending',
-    }),
-  },
-  course: {
-    table: 'course_registrations',
-  },
-  contact: {
-    table: 'contact_messages',
-  },
-  fresh: {
-    table: 'meal_inquiries',
-    transform: (data) => ({
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      meal_type: data.product_interest,
-      delivery_frequency: data.preferred_plan || 'one-time',
-      dietary_requirements: data.notes || null,
-      quantity: 1,
-      status: 'pending',
-    }),
-  },
-};
-
-const submitInquiry = async (
-  type: InquirySubmitType,
-  data: Record<string, unknown>
-) => {
-  const adapter = inquiryAdapters[type];
-
-  if (!adapter) {
-    throw new AppError(`Inquiry type '${type}' is not supported.`, 'SERVER');
-  }
-
-  const record = adapter.transform
-    ? adapter.transform(data)
-    : {
-        ...data,
+// Catering Bookings
+export const submitCateringInquiry = async (data: schemas.CateringInquiry) => {
+  const { data: result, error } = await supabase
+    .from('bookings')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        event_type: data.event_type,
+        guest_count: data.guest_count,
+        event_date: data.event_date,
+        location: data.location,
+        catering_style: data.catering_style,
+        special_requirements: data.special_requirements,
         status: 'pending',
-      };
+      },
+    ])
+    .select();
 
-  const { data: result, error } = await supabase.from(adapter.table).insert([record]).select();
-
-  if (error) {
-    throw new AppError(`Failed to submit ${type} inquiry: ${error.message}`, 'SERVER', true);
-  }
-
+  if (error) throw new Error(error.message);
   return result?.[0];
 };
 
-export const submitCateringInquiry = async (data: schemas.CateringInquiry) =>
-  submitInquiry('catering', data);
+// Corporate Events
+export const submitCorporateEventInquiry = async (data: schemas.CorporateEvent) => {
+  const { data: result, error } = await supabase
+    .from('corporate_events')
+    .insert([
+      {
+        company_name: data.company_name,
+        contact_name: data.contact_name,
+        email: data.email,
+        phone: data.phone,
+        event_type: data.event_type,
+        event_date: data.event_date,
+        guest_count: data.guest_count,
+        budget: data.budget,
+        requirements: data.requirements,
+        status: 'pending',
+      },
+    ])
+    .select();
 
-export const submitCorporateEventInquiry = async (data: schemas.CorporateEvent) =>
-  submitInquiry('corporate', data);
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
 
-export const submitMealInquiry = async (data: schemas.MealInquiry) =>
-  submitInquiry('meal', data);
+// Meal Inquiries
+export const submitMealInquiry = async (data: schemas.MealInquiry) => {
+  const { data: result, error } = await supabase
+    .from('meal_inquiries')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        meal_type: data.meal_type,
+        delivery_frequency: data.delivery_frequency,
+        dietary_requirements: data.dietary_requirements,
+        quantity: data.quantity,
+        status: 'pending',
+      },
+    ])
+    .select();
 
-export const submitConsultationRequest = async (data: schemas.Consultation) =>
-  submitInquiry('consultation', data);
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
 
-export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry) =>
-  submitInquiry('privateChef', data);
+// Consultations
+export const submitConsultationRequest = async (data: schemas.Consultation) => {
+  const { data: result, error } = await supabase
+    .from('consultations')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        consultation_type: data.consultation_type,
+        available_dates: data.available_dates,
+        budget: data.budget,
+        requirements: data.requirements,
+        status: 'pending',
+      },
+    ])
+    .select();
 
-export const submitCourseRegistration = async (data: schemas.CourseRegistration) =>
-  submitInquiry('course', data);
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
 
-export const submitContactMessage = async (data: schemas.ContactMessage) =>
-  submitInquiry('contact', data);
+// Private Chef Inquiries
+export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry) => {
+  const { data: result, error } = await supabase
+    .from('consultations')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        consultation_type: data.event_type,
+        available_dates: data.preferred_date,
+        budget: null,
+        requirements: `Location: ${data.location}${data.special_requests ? `\nSpecial Requests: ${data.special_requests}` : ''}`,
+        status: 'pending',
+      },
+    ])
+    .select();
 
-export const submitFreshInquiry = async (data: schemas.FreshInquiry) =>
-  submitInquiry('fresh', data);
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
+
+// Course Registrations
+export const submitCourseRegistration = async (data: schemas.CourseRegistration) => {
+  const { data: result, error } = await supabase
+    .from('course_registrations')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        course_name: data.course_name,
+        experience_level: data.experience_level,
+        dietary_restrictions: data.dietary_restrictions,
+        guests: data.guests || 1,
+        status: 'pending',
+      },
+    ])
+    .select();
+
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
+
+// Contact Messages
+export const submitContactMessage = async (data: schemas.ContactMessage) => {
+  const { data: result, error } = await supabase
+    .from('contact_messages')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        subject: data.subject,
+        message: data.message,
+        status: 'pending',
+      },
+    ])
+    .select();
+
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
+
+// Fresh Food Inquiries
+export const submitFreshInquiry = async (data: schemas.FreshInquiry) => {
+  const { data: result, error } = await supabase
+    .from('meal_inquiries')
+    .insert([
+      {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        meal_type: data.product_interest,
+        delivery_frequency: data.preferred_plan || 'one-time',
+        dietary_requirements: data.notes || null,
+        quantity: 1,
+        status: 'pending',
+      },
+    ])
+    .select();
+
+  if (error) throw new Error(error.message);
+  return result?.[0];
+};
 
 // Admin queries
-export type InquiryCategoryKey = 'catering' | 'corporate' | 'meals' | 'consultations' | 'courses' | 'contact';
-
-const inquiryCategoryTableMap: Record<InquiryCategoryKey, string> = {
-  catering: 'bookings',
-  corporate: 'corporate_events',
-  meals: 'meal_inquiries',
-  consultations: 'consultations',
-  courses: 'course_registrations',
-  contact: 'contact_messages',
-};
-
-export interface PaginatedInquiryResult<T> {
-  data: T[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-}
-
-export const fetchInquiriesByCategory = async <T = unknown>(
-  category: InquiryCategoryKey,
-  page = 1,
-  pageSize = UI_CONSTANTS.ADMIN_PAGE_SIZE
-): Promise<PaginatedInquiryResult<T>> => {
-  const table = inquiryCategoryTableMap[category];
-  const from = (page - 1) * pageSize;
-  const to = page * pageSize - 1;
-
-  const { data, error, count } = await supabase
-    .from(table)
-    .select('*', { count: 'exact' })
-    .order('created_at', { ascending: false })
-    .range(from, to);
-
-  if (error) {
-    throw new AppError(`Failed to fetch ${category} inquiries: ${error.message}`, 'SERVER', true);
-  }
-
-  return {
-    data: (data as T[]) || [],
-    totalCount: count ?? 0,
-    totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)),
-    currentPage: page,
-  };
-};
-
-export const fetchAllInquiries = async (
-  pageMap: Record<InquiryCategoryKey, number> = {
-    catering: 1,
-    corporate: 1,
-    meals: 1,
-    consultations: 1,
-    courses: 1,
-    contact: 1,
-  },
-  pageSize = UI_CONSTANTS.ADMIN_PAGE_SIZE
-) => {
-  const [catering, corporate, meals, consultations, courses, contact] = await Promise.all([
-    fetchInquiriesByCategory<types.CateringBooking>('catering', pageMap.catering, pageSize),
-    fetchInquiriesByCategory<types.CorporateEvent>('corporate', pageMap.corporate, pageSize),
-    fetchInquiriesByCategory<types.MealInquiry>('meals', pageMap.meals, pageSize),
-    fetchInquiriesByCategory<types.Consultation>('consultations', pageMap.consultations, pageSize),
-    fetchInquiriesByCategory<types.CourseRegistration>('courses', pageMap.courses, pageSize),
-    fetchInquiriesByCategory<types.ContactMessage>('contact', pageMap.contact, pageSize),
+export const fetchAllInquiries = async () => {
+  const [bookings, corporate, meals, consultations, courses, contacts] = await Promise.all([
+    supabase.from('bookings').select('*').order('created_at', { ascending: false }),
+    supabase.from('corporate_events').select('*').order('created_at', { ascending: false }),
+    supabase.from('meal_inquiries').select('*').order('created_at', { ascending: false }),
+    supabase.from('consultations').select('*').order('created_at', { ascending: false }),
+    supabase.from('course_registrations').select('*').order('created_at', { ascending: false }),
+    supabase.from('contact_messages').select('*').order('created_at', { ascending: false }),
   ]);
 
   return {
-    catering,
-    corporate,
-    meals,
-    consultations,
-    courses,
-    contact,
+    catering: bookings.data || [],
+    corporate: corporate.data || [],
+    meals: meals.data || [],
+    consultations: consultations.data || [],
+    courses: courses.data || [],
+    contact: contacts.data || [],
   };
 };
 

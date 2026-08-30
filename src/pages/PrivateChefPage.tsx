@@ -8,7 +8,7 @@ import { privateChefInquirySchema } from '../lib/validationSchemas';
 import { submitPrivateChefInquiry } from '../services/supabaseService';
 import experienceOne from '../assets/event.jpg';
 import experienceTwo from '../assets/menu.jpg';
-import experienceThree from '../assets/hero-hero.jpg';
+import experienceThree from '../assets/privateChef.png';
 import experienceFour from '../assets/hero.png';
 
 const signatureExperiences = [
@@ -126,7 +126,8 @@ export default function PrivateChefPage() {
               A personalized luxury dining journey created for your most meaningful moments.
             </h2>
             <p className="text-lg leading-9 text-gray-700 mb-6 max-w-2xl">
-              Valtrix brings executive private chef service to exceptional homes, venues, and events. We combine tailored menus, elegant hospitality and cinematic presentation so every experience feels intimate, luxurious and unforgettable.
+              Valtrix brings executive private chef service to exceptional homes, venues, and events. We combine tailored menus, elegant hospitality and 
+              cinematic presentation so every experience feels intimate, luxurious and unforgettable.
             </p>
             <ul className="space-y-4 text-gray-700">
               <li className="flex gap-3 items-start">

@@ -1,17 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ROUTES, SERVICES } from '../../lib/constants';
-import { fetchServices } from '../../services/supabaseService';
-import privateChefImage from '../../assets/privateChef.png';
-import cateringImage from '../../assets/catering.jpg';
-import corporateImage from '../../assets/coporate.jpg';
-import freshImage from '../../assets/valtrixfresh.png';
-import culinaryImage from '../../assets/culinaryExperience.png';
-import consultationImage from '../../assets/consultation.png';
-import partnershipImage from '../../assets/partnership.jpg';
-import studioImage from '../../assets/event.jpg';
-import rentalImage from '../../assets/hero.png';
+import { ROUTES } from '../../lib/constants';
 
 const serviceLinks: Record<string, string> = {
   'private-chef-experiences': ROUTES.PRIVATE_CHEF,
@@ -21,75 +10,21 @@ const serviceLinks: Record<string, string> = {
   'culinary-experiences': ROUTES.CULINARY_EXPERIENCES,
   'chef-consultation': ROUTES.CHEF_CONSULTATION,
   'catering-partnerships': ROUTES.CATERING_PARTNERSHIPS,
-  'valtrix-studio': ROUTES.VALTRIX_STUDIO,
-  'equipment-rental': ROUTES.EQUIPMENT_RENTAL,
 };
 
 const serviceImages: Record<string, string> = {
-  'private-chef-experiences': privateChefImage,
-  'premium-catering': cateringImage,
-  'corporate-events': corporateImage,
-  'valtrix-fresh': freshImage,
-  'culinary-experiences': culinaryImage,
-  'chef-consultation': consultationImage,
-  'catering-partnerships': partnershipImage,
-  'valtrix-studio': studioImage,
-  'equipment-rental': rentalImage,
+  'private-chef-experiences': 'https://images.unsplash.com/photo-1556910103-1c02411297e3?w=600&h=600&fit=crop',
+  'premium-catering': 'https://images.unsplash.com/photo-1555939594-58d7cb561484?w=600&h=600&fit=crop',
+  'corporate-events': 'https://images.unsplash.com/photo-1519167758993-41d2f9c991cc?w=600&h=600&fit=crop',
+  'valtrix-fresh': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=600&fit=crop',
+  'culinary-experiences': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop',
+  'chef-consultation': 'https://images.unsplash.com/photo-1507668077129-56e32842fcaf?w=600&h=600&fit=crop',
+  'catering-partnerships': 'https://images.unsplash.com/photo-1552566626-52f8b29e6e80?w=600&h=600&fit=crop',
 };
 
-type UiService = {
-  id: string;
-  name: string;
-  slug: string;
-  shortDescription: string;
-  description: string;
-  imageUrl?: string;
-};
-
-const buildFallbackServices = (): UiService[] =>
-  SERVICES.map((service) => ({
-    id: service.id,
-    name: service.name,
-    slug: service.slug,
-    shortDescription: service.shortDescription,
-    description: service.description,
-    imageUrl: undefined,
-  }));
+import { SERVICES } from '../../lib/constants';
 
 export default function ServicesGrid() {
-  const [services, setServices] = useState<UiService[]>(buildFallbackServices());
-
-  useEffect(() => {
-    let isMounted = true;
-
-    fetchServices()
-      .then((data) => {
-        if (!isMounted) return;
-
-        const mappedServices = data
-          .filter((service) => service.is_active !== false)
-          .map((service) => ({
-            id: service.id,
-            name: service.name,
-            slug: service.slug,
-            shortDescription: service.short_description || '',
-            description: service.description,
-            imageUrl: service.image_url || undefined,
-          }));
-
-        if (mappedServices.length > 0) {
-          setServices(mappedServices);
-        }
-      })
-      .catch(() => {
-        // Keep fallback services if fetching fails
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -115,7 +50,7 @@ export default function ServicesGrid() {
       viewport={{ once: true }}
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
     >
-      {services.map((service) => (
+      {SERVICES.map((service) => (
         <motion.div key={service.id} variants={itemVariants}>
           <Link
             to={serviceLinks[service.slug] || ROUTES.CONTACT}
@@ -123,7 +58,7 @@ export default function ServicesGrid() {
           >
             <div className="relative h-48 overflow-hidden bg-gray-200">
               <img
-                src={service.imageUrl || serviceImages[service.slug] || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=400&fit=crop'}
+                src={serviceImages[service.slug] || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=400&fit=crop'}
                 alt={service.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
