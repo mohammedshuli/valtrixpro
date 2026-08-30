@@ -33,7 +33,6 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<FreshInquiry>({
     resolver: zodResolver(freshInquirySchema),
   });

@@ -139,7 +139,9 @@ export default function AdminDashboard() {
     if (!inquiries) return [];
 
     return (Object.entries(inquiries) as [InquiryCategoryKey, PaginatedInquiryResult<unknown>][]) 
-      .flatMap(([category, result]) => result.data.map((item: Record<string, unknown>) => normalizeInquiry(category, item)))
+      .flatMap(([category, result]) =>
+        (result.data as Record<string, unknown>[]).map((item) => normalizeInquiry(category, item))
+      )
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 6);
   }, [inquiries]);

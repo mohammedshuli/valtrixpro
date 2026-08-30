@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import InquiryForm from '../forms/InquiryForm';
-import { corporateEventSchema, type CorporateEvent } from '../../lib/validationSchemas';
+import { corporateEventSchema } from '../../lib/validationSchemas';
 import { submitCorporateEventInquiry } from '../../services/supabaseService';
 
 const corporateFields = [
@@ -100,7 +100,7 @@ export default function CorporateInquiryCTA() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
           >
-            <InquiryForm<CorporateEvent>
+            <InquiryForm
               title="Corporate Event Inquiry"
               description="Tell us about your corporate event and we'll create a premium hospitality proposal."
               schema={corporateEventSchema}

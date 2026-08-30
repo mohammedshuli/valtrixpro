@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { useForm, type FieldErrors, type FieldValues, type Path, type SubmitHandler } from 'react-hook-form';
-import type { ZodTypeAny, infer as zInfer } from 'zod';
+import type { ZodTypeAny } from 'zod';
 import { UI_CONSTANTS } from '../../lib/constants';
 
 type InquiryInputType = 'text' | 'email' | 'phone' | 'date' | 'number' | 'select' | 'textarea';
@@ -16,13 +16,13 @@ export type InquiryFieldConfig = {
   options?: Array<{ value: string; label: string }>;
 };
 
-export type InquiryFormProps<T extends ZodTypeAny> = {
+export type InquiryFormProps = {
   title: string;
   description: string;
-  schema: T;
+  schema: ZodTypeAny;
   fields: Array<InquiryFieldConfig>;
   submitButtonText?: string;
-  onSubmit: (data: zInfer<T>) => Promise<void>;
+  onSubmit: (data: any) => Promise<void> | void;
   successMessage?: string;
 };
 
@@ -32,7 +32,7 @@ function getErrorMessage<FormData extends FieldValues>(errors: FieldErrors<FormD
   return typeof message === 'string' ? message : undefined;
 }
 
-export default function InquiryForm<T extends ZodTypeAny>({
+export default function InquiryForm({
   title,
   description,
   schema,
@@ -40,7 +40,7 @@ export default function InquiryForm<T extends ZodTypeAny>({
   submitButtonText = 'Submit Inquiry',
   onSubmit,
   successMessage = "Thank you! We'll be in touch soon.",
-}: InquiryFormProps<T>) {
+}: InquiryFormProps) {
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const timeoutRefs = useRef<number[]>([]);
@@ -52,14 +52,12 @@ export default function InquiryForm<T extends ZodTypeAny>({
     };
   }, []);
 
-  type FormData = zInfer<T> extends FieldValues ? zInfer<T> : FieldValues;
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<FormData>({
+  } = useForm<Record<string, unknown>>({
     resolver: zodResolver(schema as any) as any,
   });
 
@@ -68,7 +66,7 @@ export default function InquiryForm<T extends ZodTypeAny>({
     timeoutRefs.current = [];
   };
 
-  const onSubmitForm: SubmitHandler<FormData> = async (data) => {
+  const onSubmitForm: SubmitHandler<Record<string, unknown>> = async (data) => {
     try {
       clearPendingTimers();
       setSubmitStatus('loading');
@@ -82,7 +80,7 @@ export default function InquiryForm<T extends ZodTypeAny>({
         timeoutRefs.current.push(timerId);
       });
 
-      await Promise.race([onSubmit(data as zInfer<T>), timeoutPromise]);
+      await Promise.race([Promise.resolve(onSubmit(data)), timeoutPromise]);
 
       setSubmitStatus('success');
       reset();
@@ -128,7 +126,7 @@ export default function InquiryForm<T extends ZodTypeAny>({
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
           {fields.map((field) => {
-            const fieldName = field.name as Path<FormData>;
+            const fieldName = field.name as Path<Record<string, unknown>>;
             const fieldError = getErrorMessage(errors, fieldName);
 
             if (field.type === 'textarea') {

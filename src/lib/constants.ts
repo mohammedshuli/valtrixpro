@@ -403,3 +403,8 @@ export const FORM_CONSTRAINTS = {
   messageMin: 10,
   messageMax: 2000,
 } as const;
+
+export const UI_CONSTANTS = {
+  FORM_SUBMISSION_TIMEOUT: 15000,
+  SUCCESS_MESSAGE_TIMEOUT: 4000,
+} as const;

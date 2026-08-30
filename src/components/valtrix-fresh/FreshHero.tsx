@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ROUTES } from '../../lib/constants';
 import freshHeroImage from '../../assets/menu.jpg';
 
 export default function FreshHero() {

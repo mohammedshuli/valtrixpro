@@ -180,8 +180,22 @@ export const submitFreshInquiry = async (data: schemas.FreshInquiry) => {
   return result?.[0];
 };
 
+type PaginatedInquiryResult<T> = {
+  data: T[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+};
+
 // Admin queries
-export const fetchAllInquiries = async () => {
+export const fetchAllInquiries = async (): Promise<{
+  catering: PaginatedInquiryResult<Record<string, unknown>>;
+  corporate: PaginatedInquiryResult<Record<string, unknown>>;
+  meals: PaginatedInquiryResult<Record<string, unknown>>;
+  consultations: PaginatedInquiryResult<Record<string, unknown>>;
+  courses: PaginatedInquiryResult<Record<string, unknown>>;
+  contact: PaginatedInquiryResult<Record<string, unknown>>;
+}> => {
   const [bookings, corporate, meals, consultations, courses, contacts] = await Promise.all([
     supabase.from('bookings').select('*').order('created_at', { ascending: false }),
     supabase.from('corporate_events').select('*').order('created_at', { ascending: false }),
@@ -191,13 +205,20 @@ export const fetchAllInquiries = async () => {
     supabase.from('contact_messages').select('*').order('created_at', { ascending: false }),
   ]);
 
+  const normalize = <T extends Record<string, unknown>>(items: T[] | null): PaginatedInquiryResult<T> => ({
+    data: items ?? [],
+    totalCount: items?.length ?? 0,
+    totalPages: 1,
+    currentPage: 1,
+  });
+
   return {
-    catering: bookings.data || [],
-    corporate: corporate.data || [],
-    meals: meals.data || [],
-    consultations: consultations.data || [],
-    courses: courses.data || [],
-    contact: contacts.data || [],
+    catering: normalize(bookings.data ?? []),
+    corporate: normalize(corporate.data ?? []),
+    meals: normalize(meals.data ?? []),
+    consultations: normalize(consultations.data ?? []),
+    courses: normalize(courses.data ?? []),
+    contact: normalize(contacts.data ?? []),
   };
 };
 
