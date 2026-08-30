@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export default function PublicLayout() {
@@ -12,6 +13,7 @@ export default function PublicLayout() {
           <Outlet />
         </main>
         <Footer />
+        <FloatingWhatsApp />
       </div>
     </ErrorBoundary>
   );

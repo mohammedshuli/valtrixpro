@@ -3,8 +3,7 @@ import FreshCategoryCard from '../components/valtrix-fresh/FreshCategoryCard';
 import ProductCard from '../components/valtrix-fresh/ProductCard';
 import FreshGallery from '../components/valtrix-fresh/FreshGallery';
 import WellnessBenefits from '../components/valtrix-fresh/WellnessBenefits';
-import InquiryForm from '../components/forms/InquiryForm';
-import { freshInquirySchema, type FreshInquiry } from '../lib/validationSchemas';
+import FreshOrderForm from '../components/valtrix-fresh/FreshOrderForm';
 import { submitFreshInquiry } from '../services/supabaseService';
 import freshOne from '../assets/menu.jpg';
 import freshTwo from '../assets/event.jpg';
@@ -113,29 +112,6 @@ const signatureProducts = [
   },
 ];
 
-const freshFields = [
-  { name: 'name', label: 'Name', type: 'text' as const, placeholder: 'Your full name', required: true },
-  { name: 'phone', label: 'Phone', type: 'phone' as const, placeholder: '+255 123 456 789', required: true },
-  { name: 'email', label: 'Email', type: 'email' as const, placeholder: 'your@email.com', required: true },
-  { name: 'product_interest', label: 'Product Interest', type: 'select' as const, required: true, options: [
-      { value: 'juices', label: 'Fresh Juices' },
-      { value: 'salads', label: 'Healthy Salads' },
-      { value: 'smoothies', label: 'Smoothies' },
-      { value: 'meal-plans', label: 'Meal Plans' },
-      { value: 'detox', label: 'Detox Programs' },
-      { value: 'breakfast', label: 'Healthy Breakfast' },
-    ] },
-  { name: 'delivery_location', label: 'Delivery Location', type: 'text' as const, placeholder: 'Your location', required: true },
-  { name: 'preferred_plan', label: 'Preferred Plan', type: 'select' as const, required: false, options: [
-      { value: 'daily', label: 'Daily Fresh Delivery' },
-      { value: 'weekly', label: 'Weekly Meal Plan' },
-      { value: 'monthly', label: 'Monthly Subscription' },
-      { value: 'office', label: 'Office Meal Plan' },
-      { value: 'detox', label: 'Detox Program' },
-    ] },
-  { name: 'notes', label: 'Special Notes', type: 'textarea' as const, placeholder: 'Dietary requirements, allergies, or preferences', required: false },
-];
-
 export default function ValtrixFreshPage() {
   return (
     <div className="bg-gradient-to-br from-[#FFF8E7] via-[#F8FCE7] to-[#FFF8E7] text-[#1F1A12]">
@@ -221,14 +197,10 @@ export default function ValtrixFreshPage() {
             </p>
           </div>
 
-          <InquiryForm<FreshInquiry>
-            title="Fresh Food Inquiry"
-            description="Complete this quick form to request premium fresh meals, juices, or wellness packages."
-            schema={freshInquirySchema}
-            fields={freshFields}
-            submitButtonText="Request Fresh Service"
-            onSubmit={async (data) => await submitFreshInquiry(data)}
-            successMessage="Thank you! We’ll reach out shortly to confirm your fresh food request."
+          <FreshOrderForm
+            onSubmit={async (data) => {
+              await submitFreshInquiry(data);
+            }}
           />
         </div>
       </section>

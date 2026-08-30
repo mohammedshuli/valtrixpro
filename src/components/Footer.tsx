@@ -3,6 +3,15 @@ import { ROUTES, SERVICES } from '../lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const serviceLinks: Record<string, string> = {
+    'private-chef-experiences': ROUTES.PRIVATE_CHEF,
+    'premium-catering': ROUTES.CATERING,
+    'corporate-events': ROUTES.CORPORATE_EVENTS,
+    'valtrix-fresh': ROUTES.MEAL_PREP,
+    'culinary-experiences': ROUTES.CULINARY_EXPERIENCES,
+    'chef-consultation': ROUTES.CHEF_CONSULTATION,
+    'catering-partnerships': ROUTES.CATERING_PARTNERSHIPS,
+  };
 
   return (
     <footer className="bg-[#7A4A00] text-white mt-20">
@@ -22,9 +31,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {SERVICES.slice(0, 4).map((service) => (
                 <li key={service.id}>
-                  <a href="#" className="text-[#FFD77A] hover:text-white transition-colors">
+                  <Link
+                    to={serviceLinks[service.slug] || ROUTES.SERVICES}
+                    className="text-[#FFD77A] hover:text-white transition-colors"
+                  >
                     {service.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -57,13 +69,13 @@ export default function Footer() {
             <h4 className="font-playfair text-lg font-semibold mb-4">Contact</h4>
             <p className="text-[#FFD77A] text-sm mb-2">Dar es Salaam, Tanzania</p>
             <p className="text-[#FFD77A] text-sm mb-2">
-              <a href="mailto:hello@valtrixprofchef.com" className="hover:text-white transition-colors">
-                hello@valtrixprofchef.com
+              <a href="mailto:valtrixprofchef@gmail.com" className="hover:text-white transition-colors">
+                valtrixprofchef@gmail.com
               </a>
             </p>
             <p className="text-[#FFD77A] text-sm">
-              <a href="tel:+255123456789" className="hover:text-white transition-colors">
-                +255 123 456 789
+              <a href="tel:+255655734453" className="hover:text-white transition-colors">
+                +255 655 734 453
               </a>
             </p>
           </div>

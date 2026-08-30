@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ROUTES } from '../lib/constants';
 import { Link } from 'react-router-dom';
 import ServicesGrid from '../components/sections/ServicesGrid';
+import eventImg from '../assets/event.jpg';
 
 export default function ServicesPage() {
   return (
@@ -12,7 +13,7 @@ export default function ServicesPage() {
         animate={{ opacity: 1 }}
         className="relative py-16 md:py-24 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/src/assets/event.jpg')`,
+          backgroundImage: `url(${eventImg})`,
         }}
       >
         <div className="absolute inset-0 bg-black/40"></div>

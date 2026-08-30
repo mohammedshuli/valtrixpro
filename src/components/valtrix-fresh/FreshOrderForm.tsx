@@ -170,7 +170,7 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
             type="button"
             variant="outline"
             className="flex-1 h-12 border-[#E6A520] text-[#E6A520] hover:bg-[#E6A520] hover:text-white font-semibold rounded-xl"
-            onClick={() => window.open('https://wa.me/255123456789', '_blank')}
+            onClick={() => window.open('https://wa.me/255655734453', '_blank')}
           >
             Order via WhatsApp
           </Button>

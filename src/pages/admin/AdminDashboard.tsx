@@ -3,8 +3,14 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllInquiries } from '../../services/supabaseService';
 import { ROUTES } from '../../lib/constants';
-import type { PaginatedInquiryResult } from '../../services/supabaseService';
 import type { InquiryStatus } from '../../types';
+
+type PaginatedInquiryResult<T> = {
+  data: T[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+};
 
 type InquiryCategoryKey = 'catering' | 'corporate' | 'meals' | 'consultations' | 'courses' | 'contact';
 
@@ -133,7 +139,7 @@ export default function AdminDashboard() {
     if (!inquiries) return [];
 
     return (Object.entries(inquiries) as [InquiryCategoryKey, PaginatedInquiryResult<unknown>][]) 
-      .flatMap(([category, result]) => result.data.map((item) => normalizeInquiry(category, item as Record<string, unknown>)))
+      .flatMap(([category, result]) => result.data.map((item: Record<string, unknown>) => normalizeInquiry(category, item)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 6);
   }, [inquiries]);
@@ -235,12 +241,12 @@ export default function AdminDashboard() {
                   ) : (
                     latestInquiries.map((item) => (
                       <tr key={item.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 text-sm font-medium text-[#7A4A00]">{categoryConfig[item.category].label}</td>
+                        <td className="py-3 text-sm font-medium text-[#7A4A00]">{categoryConfig[item.category as InquiryCategoryKey].label}</td>
                         <td className="py-3">{item.label}</td>
                         <td className="py-3">{item.email}</td>
                         <td className="py-3">{item.date}</td>
                         <td className="py-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClasses[item.status]}`}>{item.status}</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusClasses[item.status as InquiryStatus]}`}>{item.status}</span>
                         </td>
                       </tr>
                     ))

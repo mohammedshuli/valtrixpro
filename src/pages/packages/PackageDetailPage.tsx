@@ -37,7 +37,7 @@ export default function PackageDetailPage() {
 
   const handleWhatsAppInquiry = () => {
     const message = `Hello Valtrix Pro Chef, I am interested in the ${packageItem.name}.`;
-    const whatsappUrl = `https://wa.me/255XXXXXXXXX?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/255655734453?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

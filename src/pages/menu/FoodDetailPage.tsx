@@ -39,7 +39,7 @@ export default function FoodDetailPage() {
 
   const handleWhatsAppOrder = () => {
     const message = `Hello Valtrix Pro Chef, I would like to order ${quantity}x ${foodItem.name}.`;
-    const whatsappUrl = `https://wa.me/255XXXXXXXXX?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/255655734453?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

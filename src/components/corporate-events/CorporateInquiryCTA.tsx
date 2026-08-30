@@ -82,7 +82,7 @@ export default function CorporateInquiryCTA() {
                   <p className="text-sm opacity-90">Chat with our corporate hospitality experts</p>
                 </div>
                 <a
-                  href="https://wa.me/255123456789?text=Hello%20Valtrix%20Pro%20Chef%20-%20I'd%20like%20to%20discuss%20corporate%20hospitality%20services"
+                  href="https://wa.me/255655734453?text=Hello%20Valtrix%20Pro%20Chef%20-%20I'd%20like%20to%20discuss%20corporate%20hospitality%20services"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-auto bg-white text-[#25D366] px-6 py-2 font-semibold hover:bg-gray-100 transition-colors"
