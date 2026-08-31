@@ -69,7 +69,7 @@ export default function PackagesMenuPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="relative py-24 bg-gradient-to-br from-[#FFF8E7] to-[#FFD77A]/20 overflow-hidden"
+        className="relative py-16 md:py-24 bg-gradient-to-br from-[#FFF8E7] to-[#FFD77A]/20 overflow-hidden"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -78,12 +78,12 @@ export default function PackagesMenuPage() {
           <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-[#FFD77A] rounded-full"></div>
         </div>
 
-        <div className="relative section-container text-center">
+        <div className="relative section-container text-center px-4">
           <motion.h1
             variants={itemVariants}
             initial="hidden"
             animate="visible"
-            className="text-6xl md:text-7xl font-playfair font-bold text-[#7A4A00] mb-6 leading-tight"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-playfair font-bold text-[#7A4A00] mb-4 md:mb-6 leading-tight"
           >
             Curated Culinary
             <br />
@@ -94,7 +94,7 @@ export default function PackagesMenuPage() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed font-inter"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto mb-8 md:mb-12 leading-relaxed font-inter"
           >
             Luxury meals crafted for discerning palates. Premium catering packages for unforgettable events.
             Exceptional dining experiences that transcend the ordinary.
@@ -106,17 +106,17 @@ export default function PackagesMenuPage() {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+            className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center"
           >
             <button
               onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-[#E6A520] hover:bg-[#7A4A00] text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="w-full sm:w-auto bg-[#E6A520] hover:bg-[#7A4A00] text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full transition-all duration-300 text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               Explore Menu
             </button>
             <button
               onClick={() => document.getElementById('packages-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="border-2 border-[#7A4A00] text-[#7A4A00] hover:bg-[#7A4A00] hover:text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 text-lg"
+              className="w-full sm:w-auto border-2 border-[#7A4A00] text-[#7A4A00] hover:bg-[#7A4A00] hover:text-white font-semibold py-3 md:py-4 px-6 md:px-8 rounded-full transition-all duration-300 text-base md:text-lg"
             >
               Explore Catering Packages
             </button>
@@ -125,19 +125,19 @@ export default function PackagesMenuPage() {
       </motion.section>
 
       {/* Featured Items Section */}
-      <section className="section bg-white py-20">
-        <div className="section-container">
+      <section className="section bg-white py-16 md:py-20">
+        <div className="section-container px-4">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
+            <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl md:text-5xl font-playfair font-bold mb-3 md:mb-4 text-[#7A4A00]">
               Signature Creations
             </motion.h2>
-            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto">
+            <motion.p variants={itemVariants} className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto">
               Chef-curated masterpieces showcasing the finest in Tanzanian and international cuisine.
               Each dish tells a story of passion, tradition, and innovation.
             </motion.p>
@@ -148,7 +148,7 @@ export default function PackagesMenuPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
           >
             {featuredFoodItems.map((item, index) => (
               <FeaturedFoodCard
@@ -164,19 +164,19 @@ export default function PackagesMenuPage() {
       </section>
 
       {/* Food Categories + Search */}
-      <section id="menu-section" className="section bg-[#FFF8E7] py-16">
-        <div className="section-container">
+      <section id="menu-section" className="section bg-[#FFF8E7] py-16 md:py-20">
+        <div className="section-container px-4">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-10 md:mb-12"
           >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
+            <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl md:text-5xl font-playfair font-bold mb-3 md:mb-4 text-[#7A4A00]">
               Our Culinary Collection
             </motion.h2>
-            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
+            <motion.p variants={itemVariants} className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto mb-6 md:mb-8">
               Discover our comprehensive menu featuring breakfast, lunch, dinner, and specialty items
               crafted with premium ingredients and culinary expertise.
             </motion.p>
@@ -199,52 +199,61 @@ export default function PackagesMenuPage() {
       </section>
 
       {/* Food Menu Grid */}
-      <section className="section bg-white py-16">
-        <div className="section-container">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
-          >
-            {filteredFoodItems.map((item, index) => (
-              <FoodCard
-                key={item.id}
-                item={item}
-                index={index}
-                onAddToCart={addToCart}
-                onClick={() => handleFoodClick(item.id)}
-              />
-            ))}
-          </motion.div>
-
-          {filteredFoodItems.length === 0 && (
+      <section className="section bg-white py-16 md:py-20">
+        <div className="section-container px-4">
+          {filteredFoodItems.length > 0 ? (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
+            >
+              {filteredFoodItems.map((item, index) => (
+                <FoodCard
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onAddToCart={addToCart}
+                  onClick={() => handleFoodClick(item.id)}
+                />
+              ))}
+            </motion.div>
+          ) : (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center py-12"
+              className="text-center py-12 md:py-16"
             >
-              <p className="text-gray-500 text-lg">No items found matching your search.</p>
+              <p className="text-gray-500 text-base md:text-lg">No items found matching your search.</p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                }}
+                className="mt-4 text-[#E6A520] hover:text-[#7A4A00] font-semibold transition-colors"
+              >
+                Clear Filters
+              </button>
             </motion.div>
           )}
         </div>
       </section>
 
       {/* Catering Packages Grid */}
-      <section id="packages-section" className="section bg-[#FFF8E7] py-20">
-        <div className="section-container">
+      <section id="packages-section" className="section bg-[#FFF8E7] py-16 md:py-20">
+        <div className="section-container px-4">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 md:mb-16"
           >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-playfair font-bold mb-4 text-[#7A4A00]">
+            <motion.h2 variants={itemVariants} className="text-3xl sm:text-4xl md:text-5xl font-playfair font-bold mb-3 md:mb-4 text-[#7A4A00]">
               Premium Catering Packages
             </motion.h2>
-            <motion.p variants={itemVariants} className="text-lg text-gray-700 max-w-2xl mx-auto">
+            <motion.p variants={itemVariants} className="text-sm sm:text-base md:text-lg text-gray-700 max-w-2xl mx-auto">
               Elevate your events with our expertly crafted catering packages,
               designed for weddings, corporate functions, and special celebrations.
             </motion.p>
@@ -255,7 +264,7 @@ export default function PackagesMenuPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8"
           >
             {CATERING_PACKAGES.map((pkg, index) => (
               <PackageCard

@@ -16,6 +16,7 @@ const serviceLinks = [
 
 const mainNav = [
   { label: 'Home', path: ROUTES.HOME },
+  { label: 'Menu', path: ROUTES.PACKAGES_MENU },
   { label: 'About', path: ROUTES.ABOUT },
   { label: 'Gallery', path: ROUTES.GALLERY },
   { label: 'Contact', path: ROUTES.CONTACT },
