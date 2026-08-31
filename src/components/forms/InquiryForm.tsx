@@ -22,7 +22,7 @@ export type InquiryFormProps = {
   schema: ZodTypeAny;
   fields: Array<InquiryFieldConfig>;
   submitButtonText?: string;
-  onSubmit: (data: any) => Promise<void> | void;
+  onSubmit: (data: any) => Promise<unknown> | unknown;
   successMessage?: string;
 };
 

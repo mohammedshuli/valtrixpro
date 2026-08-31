@@ -7,20 +7,42 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
+  const verifyAdminAccess = async (session: { user: { email?: string | null } } | null) => {
+    if (!session?.user?.email) {
+      setIsAuthenticated(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('id')
+        .ilike('email', session.user.email)
+        .maybeSingle();
+
+      if (error || !data) {
+        await supabase.auth.signOut();
+        setIsAuthenticated(false);
+        return;
+      }
+
+      setIsAuthenticated(true);
+    } catch {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
+      await verifyAdminAccess(session);
     };
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      await verifyAdminAccess(session);
     });
 
     return () => subscription?.unsubscribe();
