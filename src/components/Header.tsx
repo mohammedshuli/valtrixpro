@@ -39,12 +39,11 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
+  const isServiceActive = serviceLinks.some((s) => location.pathname === s.path);
+  const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
     setIsMobileServicesOpen(false);
-  }, [location.pathname]);
-
-  const isServiceActive = serviceLinks.some((s) => location.pathname === s.path);
+  };
 
   return (
     <header className="bg-[#FFF8E7] shadow-lg sticky top-0 z-50 border-b border-[#E6A520]/20">
@@ -189,6 +188,7 @@ export default function Header() {
             <nav className="flex flex-col px-4 py-4 gap-1">
               <Link
                 to={ROUTES.HOME}
+                onClick={closeMobileMenu}
                 className={`flex items-center font-medium text-base py-3 px-4 rounded-lg transition-all duration-300
                   ${location.pathname === ROUTES.HOME
                     ? 'text-[#E6A520] bg-[#E6A520]/10 font-semibold'
@@ -231,6 +231,7 @@ export default function Header() {
                         <Link
                           key={service.path}
                           to={service.path}
+                          onClick={closeMobileMenu}
                           className={`flex items-center gap-3 py-2.5 px-4 text-sm transition-all
                             ${location.pathname === service.path
                               ? 'text-[#E6A520] font-semibold'
@@ -249,6 +250,7 @@ export default function Header() {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={closeMobileMenu}
                   className={`flex items-center font-medium text-base py-3 px-4 rounded-lg transition-all duration-300
                     ${location.pathname === item.path
                       ? 'text-[#E6A520] bg-[#E6A520]/10 font-semibold'
@@ -261,6 +263,7 @@ export default function Header() {
               <div className="mt-3 pt-3 border-t border-gray-100">
                 <Link
                   to={ROUTES.CONTACT}
+                  onClick={closeMobileMenu}
                   className="btn-primary w-full text-center py-3 text-base font-semibold"
                 >
                   Get In Touch

@@ -42,7 +42,7 @@ export default function FreshOrderForm({ onSubmit }: FreshOrderFormProps) {
     try {
       await onSubmit(data);
       setSubmitMessage('Thank you! We\'ll contact you soon about your fresh experience.');
-    } catch (error) {
+    } catch {
       setSubmitMessage('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);

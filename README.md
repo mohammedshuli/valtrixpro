@@ -17,10 +17,10 @@ Valtrix Pro Chef is a modern, feature-rich digital platform that positions Tanza
 ## Tech Stack
 
 ### Frontend
-- **React 18** + **TypeScript** - Type-safe UI components
+- **React 19** + **TypeScript** - Type-safe UI components
 - **Vite** - Lightning-fast build tool
 - **Tailwind CSS** - Utility-first styling
-- **React Router v6** - Client-side routing
+- **React Router v7** - Client-side routing
 - **TanStack React Query** - Data fetching & caching
 - **Framer Motion** - Smooth animations
 - **react-hook-form** + **zod** - Form handling & validation
@@ -79,7 +79,7 @@ npm install
 
 ### 2. Configure Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
+Copy `.env.example` to `.env.local` and fill in your Supabase project URL and publishable (anon) key:
 
 ```bash
 cp .env.example .env.local
@@ -93,11 +93,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ### 3. Set Up Supabase Database
 
-#### Option A: Manual Setup
-1. Create a new Supabase project
-2. Go to SQL Editor in your Supabase dashboard
-3. Copy the entire SQL migration from `supabase/migrations/001_create_schema.sql`
-4. Paste and execute in the SQL editor
+Apply every SQL migration in `supabase/migrations/` in numeric order. For a hosted project, the Supabase CLI is preferred so migration history is tracked:
 
 #### Option B: Using Supabase CLI
 ```bash
@@ -105,6 +101,8 @@ npm install -g supabase
 supabase link --project-ref your-project-id
 supabase db push
 ```
+
+For manual setup, execute migrations `001` through `004` in order in the Supabase SQL Editor. Do not launch with only the initial schema migration applied; later migrations harden inquiry access and admin authorization.
 
 ### 4. Create Admin User
 
@@ -141,29 +139,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 10. **Contact** - General contact form with location info
 
 ### Admin Dashboard
-Access at `/admin/login`
-
-#### Module 1: Inquiry Management
-- View all submissions (catering, corporate, meal prep, consultation, masterclass, contact)
-- Filter by type and status
-- Update inquiry status (pending → contacted → confirmed → completed)
-- View full submission details
-
-#### Module 2: Content Management
-- Edit homepage hero section
-- Edit service descriptions
-- Manage testimonials (add/edit/delete/reorder)
-
-#### Module 3: Media Management
-- Upload images to Supabase Storage
-- Manage gallery
-- Update promotional banners
-
-#### Module 4: Analytics Overview
-- Inquiry count by type (last 30 days)
-- Most requested services
-- Recent activity feed
-- Monthly trends
+Access at `/admin/login`. Admin authentication and route protection are present, but inquiry management, content editing, media management, and analytics routes are placeholders and are not operational workflows. Do not rely on them to process production inquiries; arrange a separate monitored process until these modules are implemented.
 
 ## Forms & Validation
 
@@ -177,7 +153,7 @@ All forms use **react-hook-form** + **zod** validation:
 5. **Masterclass Registration** - Course selection, experience level
 6. **General Contact** - Message submission
 
-All forms:
+All implemented public inquiry forms:
 - ✅ Client-side validation with zod
 - ✅ Real-time error feedback
 - ✅ Success/error states
@@ -207,13 +183,7 @@ All tables include:
 
 ## Security
 
-✅ **Row Level Security (RLS)** enabled on all tables
-✅ **Public users** can INSERT only, cannot SELECT inquiry tables
-✅ **Admins** have full CRUD access
-✅ **Authentication** via Supabase Auth (email/password)
-✅ **Protected routes** for admin dashboard
-✅ **Input validation** with zod schemas
-✅ **CORS configured** for Supabase
+RLS policies are defined by the ordered migrations. Public inquiry inserts are intentionally allowed, while inquiry reads and admin operations require the appropriate access. Verify the effective policies in the hosted project after applying migrations. Client-side Zod validation is not an abuse-control boundary; add server-verified throttling/CAPTCHA before exposing forms to substantial public traffic.
 
 ## Build & Deploy
 
@@ -223,6 +193,8 @@ npm run build
 ```
 
 Outputs optimized build to `dist/`
+
+Run `npm run lint` and `npm run build` before deployment. Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting provider. These `VITE_` values are exposed to browsers; use only the publishable/anon key and never place a service-role key in a frontend environment variable.
 
 ### Deploy Options
 
@@ -245,11 +217,11 @@ netlify deploy
 
 ## Performance Optimization
 
-✅ **Code Splitting** - Route-based lazy loading
+✅ **Code Splitting** - Route-level lazy loading
 ✅ **Image Optimization** - Unsplash placeholders (replace with CDN)
 ✅ **Caching** - React Query default 5-minute stale time
-✅ **Compression** - Gzip enabled
-✅ **CSS** - Tailwind purged unused styles
+✅ **Compression** - Hosting should serve compressed assets
+✅ **CSS** - Tailwind removes unused styles
 
 Target metrics:
 - Homepage load: < 3 seconds

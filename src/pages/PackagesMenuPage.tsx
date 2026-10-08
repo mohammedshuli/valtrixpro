@@ -9,6 +9,8 @@ import SearchBar from '../components/menu/SearchBar';
 import CategoryTabs from '../components/menu/CategoryTabs';
 import CartIcon from '../components/menu/CartIcon';
 
+const featuredFoodIds = new Set<string>(FEATURED_FOODS);
+
 export default function PackagesMenuPage() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -27,7 +29,7 @@ export default function PackagesMenuPage() {
 
   // Get featured food items
   const featuredFoodItems = useMemo(() => {
-    return FOOD_MENU_ITEMS.filter(item => FEATURED_FOODS.includes(item.id as any));
+    return FOOD_MENU_ITEMS.filter((item) => featuredFoodIds.has(item.id));
   }, []);
 
   const addToCart = (itemId: string) => {

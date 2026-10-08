@@ -8,13 +8,12 @@ const submitInquiry = async <T extends Record<string, unknown>>(table: string, d
     status: 'pending',
   };
 
-  const { data: result, error } = await supabase
+  const { error } = await supabase
     .from(table)
-    .insert([payload])
-    .select();
+    .insert([payload]);
 
   if (error) throw new Error(error.message);
-  return (result?.[0] ?? payload) as T;
+  return payload as T;
 };
 
 // Catering Bookings
@@ -82,7 +81,7 @@ export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry)
     consultation_type: data.event_type,
     available_dates: data.preferred_date,
     budget: null,
-    requirements: `Location: ${data.location}${data.special_requests ? `\nSpecial Requests: ${data.special_requests}` : ''}`,
+    requirements: `Location: ${data.location}\nGuest count: ${data.guest_count}${data.special_requests ? `\nSpecial Requests: ${data.special_requests}` : ''}`,
   });
 };
 
@@ -118,6 +117,7 @@ export const submitFreshInquiry = async (data: schemas.FreshInquiry) => {
     phone: data.phone,
     meal_type: data.product_interest,
     delivery_frequency: data.preferred_plan || 'one-time',
+    delivery_location: data.delivery_location,
     dietary_requirements: data.notes || null,
     quantity: 1,
   });

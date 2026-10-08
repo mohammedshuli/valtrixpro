@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { useForm, type FieldErrors, type FieldValues, type Path, type SubmitHandler } from 'react-hook-form';
-import type { ZodTypeAny } from 'zod';
+import { z } from 'zod';
 import { UI_CONSTANTS } from '../../lib/constants';
 
 type InquiryInputType = 'text' | 'email' | 'phone' | 'date' | 'number' | 'select' | 'textarea';
@@ -16,13 +16,13 @@ export type InquiryFieldConfig = {
   options?: Array<{ value: string; label: string }>;
 };
 
-export type InquiryFormProps = {
+export type InquiryFormProps<Schema extends z.ZodObject> = {
   title: string;
   description: string;
-  schema: ZodTypeAny;
+  schema: Schema;
   fields: Array<InquiryFieldConfig>;
   submitButtonText?: string;
-  onSubmit: (data: any) => Promise<unknown> | unknown;
+  onSubmit: (data: z.infer<Schema>) => Promise<unknown> | unknown;
   successMessage?: string;
 };
 
@@ -32,7 +32,7 @@ function getErrorMessage<FormData extends FieldValues>(errors: FieldErrors<FormD
   return typeof message === 'string' ? message : undefined;
 }
 
-export default function InquiryForm({
+export default function InquiryForm<Schema extends z.ZodObject>({
   title,
   description,
   schema,
@@ -40,52 +40,50 @@ export default function InquiryForm({
   submitButtonText = 'Submit Inquiry',
   onSubmit,
   successMessage = "Thank you! We'll be in touch soon.",
-}: InquiryFormProps) {
+}: InquiryFormProps<Schema>) {
+  type FormData = z.infer<Schema>;
+  type FormInput = z.input<Schema>;
+
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const timeoutRefs = useRef<number[]>([]);
 
   useEffect(() => {
-    return () => {
-      timeoutRefs.current.forEach(clearTimeout);
-      timeoutRefs.current = [];
-    };
-  }, []);
+    if (submitStatus !== 'success') return;
+
+    const timerId = window.setTimeout(() => setSubmitStatus('idle'), UI_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);
+    return () => window.clearTimeout(timerId);
+  }, [submitStatus]);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<Record<string, unknown>>({
-    resolver: zodResolver(schema as any) as any,
+  } = useForm<FormInput, unknown, FormData>({
+    resolver: zodResolver(schema),
   });
 
-  const clearPendingTimers = () => {
-    timeoutRefs.current.forEach(clearTimeout);
-    timeoutRefs.current = [];
-  };
-
-  const onSubmitForm: SubmitHandler<Record<string, unknown>> = async (data) => {
+  const onSubmitForm: SubmitHandler<FormData> = async (data) => {
     try {
-      clearPendingTimers();
       setSubmitStatus('loading');
       setErrorMessage('');
 
+      let timeoutId: number | undefined;
       const timeoutPromise = new Promise<never>((_, reject) => {
-        const timerId = window.setTimeout(
+        timeoutId = window.setTimeout(
           () => reject(new Error('Request timed out. Please try again.')),
           UI_CONSTANTS.FORM_SUBMISSION_TIMEOUT
         );
-        timeoutRefs.current.push(timerId);
       });
 
-      await Promise.race([Promise.resolve(onSubmit(data)), timeoutPromise]);
+      try {
+        await Promise.race([Promise.resolve(onSubmit(data)), timeoutPromise]);
+      } finally {
+        if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      }
 
       setSubmitStatus('success');
       reset();
-      const completeTimer = window.setTimeout(() => setSubmitStatus('idle'), UI_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);
-      timeoutRefs.current.push(completeTimer);
     } catch (error) {
       setSubmitStatus('error');
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
@@ -126,7 +124,7 @@ export default function InquiryForm({
 
         <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
           {fields.map((field) => {
-            const fieldName = field.name as Path<Record<string, unknown>>;
+            const fieldName = field.name as Path<FormInput>;
             const fieldError = getErrorMessage(errors, fieldName);
 
             if (field.type === 'textarea') {
