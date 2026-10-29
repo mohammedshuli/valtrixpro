@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../lib/constants';
-import aboutImage from '../assets/menu.jpg';
+import studioImage from '../assets/culinaryExperience.png';
 
 const studioFeatures = [
   {
@@ -30,7 +30,7 @@ export default function ValtrixStudioPage() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         className="relative py-20 bg-cover bg-center"
-        style={{ backgroundImage: `url(${aboutImage})` }}
+        style={{ backgroundImage: `url(${studioImage})` }}
       >
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative section-container text-white text-center">
@@ -108,7 +108,7 @@ export default function ValtrixStudioPage() {
           </div>
 
           <div className="overflow-hidden rounded-[2rem] shadow-[0_25px_60px_rgba(122,74,0,0.12)]">
-            <img src={aboutImage} alt="Live chef demonstration" className="h-full w-full object-cover min-h-[460px]" />
+            <img src={studioImage} alt="Live chef demonstration" loading="lazy" className="h-full w-full object-cover min-h-[460px]" />
           </div>
         </div>
       </section>

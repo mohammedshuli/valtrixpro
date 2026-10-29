@@ -8,6 +8,7 @@ import type { InquiryStatus } from '../../types';
 type PaginatedInquiryResult<T> = {
   data: T[];
   totalCount: number;
+  pendingCount: number;
   totalPages: number;
   currentPage: number;
 };
@@ -22,6 +23,7 @@ type DashboardInquiry = {
   label: string;
   email: string;
   date: string;
+  timestamp: number;
   status: InquiryStatus;
 };
 
@@ -43,14 +45,18 @@ const statusClasses: Record<InquiryStatus, string> = {
 
 const normalizeInquiry = (category: InquiryCategoryKey, item: Record<string, unknown>): DashboardInquiry => {
   const baseDate = typeof item.created_at === 'string' ? item.created_at : '';
-  const date = baseDate ? new Date(baseDate).toLocaleDateString() : 'Unknown';
-  const status = (item.status as InquiryStatus) || 'pending';
+  const parsedDate = baseDate ? new Date(baseDate) : null;
+  const date = parsedDate && !Number.isNaN(parsedDate.valueOf()) ? parsedDate.toLocaleDateString() : 'Unknown';
+  const status: InquiryStatus = item.status === 'contacted' || item.status === 'confirmed' || item.status === 'completed'
+    ? item.status
+    : 'pending';
 
   const common = {
-    id: `${category}-${item.id ?? Math.random().toString(36).slice(2)}`,
+    id: `${category}-${item.id ?? 'unknown'}`,
     category,
     email: (item.email as string) || '—',
     date,
+    timestamp: parsedDate && !Number.isNaN(parsedDate.valueOf()) ? parsedDate.valueOf() : 0,
     status,
   };
 
@@ -108,8 +114,7 @@ export default function AdminDashboard() {
         const data = await fetchAllInquiries();
         setInquiries(data);
       } catch (error) {
-        console.error('Error loading inquiries:', error);
-        setErrorMessage('Unable to load inquiries. Please refresh the page.');
+        setErrorMessage(error instanceof Error ? error.message : 'Unable to load inquiries. Please refresh the page.');
       } finally {
         setIsLoading(false);
       }
@@ -127,10 +132,7 @@ export default function AdminDashboard() {
     ) as Record<InquiryCategoryKey, number>;
 
     const total = Object.values(byCategory).reduce((sum, value) => sum + value, 0);
-    const pending = Object.values(inquiries ?? {}).reduce((sum, result) => {
-      const items = result?.data ?? [];
-      return sum + items.filter((item) => (item as { status?: string }).status === 'pending').length;
-    }, 0);
+    const pending = Object.values(inquiries ?? {}).reduce((sum, result) => sum + result.pendingCount, 0);
 
     return { byCategory, total, pending };
   }, [inquiries]);
@@ -142,7 +144,7 @@ export default function AdminDashboard() {
       .flatMap(([category, result]) =>
         (result.data as Record<string, unknown>[]).map((item) => normalizeInquiry(category, item))
       )
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 6);
   }, [inquiries]);
 
@@ -172,7 +174,8 @@ export default function AdminDashboard() {
           <div className="card p-6">
             <p className="text-sm uppercase tracking-[0.2em] text-[#7A4A00]">Quick Actions</p>
             <div className="mt-4 space-y-2 text-sm text-gray-600">
-              <p>Use the sidebar to manage inquiries, content, media, and analytics.</p>
+              <p>Use the sidebar to review and update incoming inquiries.</p>
+              <p>Content, media, and analytics tools are not enabled for this release.</p>
               <p className="font-medium text-[#7A4A00]">Last updated: {isLoading ? 'Loading...' : 'Current data'}</p>
             </div>
           </div>
@@ -267,27 +270,6 @@ export default function AdminDashboard() {
                 className="btn btn-primary w-full"
               >
                 Manage inquiries
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.ADMIN_CONTENT)}
-                className="btn btn-secondary w-full"
-              >
-                Edit content
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.ADMIN_MEDIA)}
-                className="btn btn-secondary w-full"
-              >
-                Update media
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.ADMIN_ANALYTICS)}
-                className="btn btn-secondary w-full"
-              >
-                View analytics
               </button>
             </div>
           </section>

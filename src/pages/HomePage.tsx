@@ -6,14 +6,23 @@ import { supabase } from '../lib/supabase';
 import ServicesGrid from '../components/sections/ServicesGrid';
 import TestimonialsSection from '../components/sections/TestimonialsSection';
 import heroBackground from '../assets/hero-hero.jpg';
+import experienceImage from '../assets/hero.png';
+import corporateImage from '../assets/coporate.jpg';
+import freshImage from '../assets/valtrixfresh.png';
+import galleryOne from '../assets/menu.jpg';
+import galleryTwo from '../assets/catering.jpg';
+import galleryThree from '../assets/event.jpg';
+import galleryFour from '../assets/culinaryExperience.png';
+import galleryFive from '../assets/privateChef.png';
+import gallerySix from '../assets/hero.png';
 
 const galleryImages = [
-  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=600&fit=crop',
-  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=600&fit=crop',
+  galleryOne,
+  galleryTwo,
+  galleryThree,
+  galleryFour,
+  galleryFive,
+  gallerySix,
 ];
 
 type Testimonial = {
@@ -138,7 +147,7 @@ export default function HomePage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <img src="/src/assets/hero.png" alt="Signature Experience" className="rounded-lg shadow-2xl" />
+              <img src={experienceImage} alt="Signature Experience" loading="lazy" className="rounded-lg shadow-2xl" />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -184,8 +193,9 @@ export default function HomePage() {
               className="relative h-72 md:h-full min-h-[380px]"
             >
               <img
-                src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop"
+                src={corporateImage}
                 alt="Corporate Events"
+                loading="lazy"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
@@ -253,8 +263,9 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
             >
               <img
-                src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&h=600&fit=crop"
+                src={freshImage}
                 alt="Valtrix Fresh"
+                loading="lazy"
                 className="rounded-lg shadow-2xl"
               />
             </motion.div>
@@ -308,8 +319,8 @@ export default function HomePage() {
                 <img
                   src={src}
                   alt={`Gallery ${i + 1}`}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   loading="lazy"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </motion.div>
             ))}

@@ -5,50 +5,56 @@ import AdminSidebar from '../components/admin/AdminSidebar';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export default function AdminLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authState, setAuthState] = useState<'loading' | 'authorized' | 'denied' | 'error'>('loading');
 
   const verifyAdminAccess = async (session: { user: { email?: string | null } } | null) => {
     if (!session?.user?.email) {
-      setIsAuthenticated(false);
+      setAuthState('denied');
       return;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('admins')
-        .select('id')
-        .ilike('email', session.user.email)
-        .maybeSingle();
+    const { data, error } = await supabase
+      .from('admins')
+      .select('id')
+      .ilike('email', session.user.email)
+      .eq('role', 'admin')
+      .maybeSingle();
 
-      if (error || !data) {
-        await supabase.auth.signOut();
-        setIsAuthenticated(false);
-        return;
-      }
-
-      setIsAuthenticated(true);
-    } catch {
-      await supabase.auth.signOut();
-      setIsAuthenticated(false);
+    if (error) {
+      setAuthState('error');
+      return;
     }
+    setAuthState(data ? 'authorized' : 'denied');
   };
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (!isMounted) return;
+      if (error) {
+        setAuthState('error');
+        return;
+      }
       await verifyAdminAccess(session);
     };
 
-    checkAuth();
+    void checkAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      await verifyAdminAccess(session);
+      window.setTimeout(() => {
+        if (isMounted) void verifyAdminAccess(session);
+      }, 0);
     });
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  if (isAuthenticated === null) {
+  if (authState === 'loading') {
     return (
       <div className="min-h-screen bg-[#FFF8E7] flex items-center justify-center">
         <div className="text-center">
@@ -58,8 +64,18 @@ export default function AdminLayout() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (authState === 'denied') {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  if (authState === 'error') {
+    return (
+      <div role="alert" className="min-h-screen bg-[#FFF8E7] flex items-center justify-center p-6">
+        <p className="max-w-xl text-center text-red-700">
+          Admin access could not be verified. Check the Supabase connection and Row Level Security settings, then refresh.
+        </p>
+      </div>
+    );
   }
 
   return (

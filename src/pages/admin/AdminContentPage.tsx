@@ -1,36 +1,15 @@
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '../../lib/constants';
 
 export default function AdminContentPage() {
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-[#FFF8E7]">
       <div className="section-container py-10">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card p-8"
-        >
+        <div className="card p-8">
           <h1 className="text-4xl font-playfair font-bold text-[#7A4A00] mb-3">Content</h1>
-          <p className="text-gray-600 mb-6">
-            Manage homepage text, service highlights, testimonials, and site messaging from a central location.
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => navigate(ROUTES.ADMIN)}
-              className="btn btn-secondary"
-            >
-              Back to dashboard
-            </button>
-            <button type="button" className="btn btn-primary">
-              Open content editor
-            </button>
-          </div>
-        </motion.div>
+          <p className="text-gray-600 mb-6">Content editing is not enabled for this release. Site content is managed in the source code.</p>
+          <Link to={ROUTES.ADMIN} className="btn btn-secondary">Back to dashboard</Link>
+        </div>
       </div>
     </div>
   );

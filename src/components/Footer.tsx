@@ -11,6 +11,8 @@ export default function Footer() {
     'culinary-experiences': ROUTES.CULINARY_EXPERIENCES,
     'chef-consultation': ROUTES.CHEF_CONSULTATION,
     'catering-partnerships': ROUTES.CATERING_PARTNERSHIPS,
+    'valtrix-studio': ROUTES.VALTRIX_STUDIO,
+    'equipment-rental': ROUTES.EQUIPMENT_RENTAL,
   };
 
   return (
@@ -29,7 +31,7 @@ export default function Footer() {
           <div>
             <h4 className="font-playfair text-lg font-semibold mb-4">Services</h4>
             <ul className="space-y-2">
-              {SERVICES.slice(0, 4).map((service) => (
+              {SERVICES.map((service) => (
                 <li key={service.id}>
                   <Link
                     to={serviceLinks[service.slug] || ROUTES.SERVICES}

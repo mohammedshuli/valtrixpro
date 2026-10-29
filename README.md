@@ -66,7 +66,7 @@ src/
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20.19+ (or 22.12+)
 - npm or yarn
 - Supabase account (free tier available)
 
@@ -95,14 +95,22 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 Apply every SQL migration in `supabase/migrations/` in numeric order. For a hosted project, the Supabase CLI is preferred so migration history is tracked:
 
-#### Option B: Using Supabase CLI
+#### Using the Supabase CLI
 ```bash
 npm install -g supabase
 supabase link --project-ref your-project-id
 supabase db push
 ```
 
-For manual setup, execute migrations `001` through `004` in order in the Supabase SQL Editor. Do not launch with only the initial schema migration applied; later migrations harden inquiry access and admin authorization.
+For manual setup, execute migrations `001` through `005` in order in the Supabase SQL Editor. Do not launch before migration `005`; it revokes direct public inquiry-table writes and installs the private rate-limit store.
+
+Deploy the public inquiry function after applying the migrations:
+
+```bash
+supabase functions deploy submit-inquiry
+```
+
+The function uses Supabase's server-side `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` environment values. Confirm they are available to the Edge Function in the Supabase project settings. Never put the service-role key in `.env.local`, a `VITE_` variable, or browser code.
 
 ### 4. Create Admin User
 
@@ -126,39 +134,40 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Usage
 
-### Public Pages (10 Total)
-1. **Homepage** - Brand storytelling with conversion funnel
-2. **About** - Brand story, mission, values, team
-3. **Services** - Full service overview
-4. **Catering** - Catering showcase + inquiry form
-5. **Corporate Events** - B2B services + inquiry form
-6. **Valtrix Fresh** - Meal prep product line + inquiry form
-7. **Culinary Experiences** - Masterclasses + registration form
-8. **Chef Consultation** - Consultation services + request form
-9. **Gallery** - Visual portfolio with category filtering
-10. **Contact** - General contact form with location info
+### Primary Public Routes
+- `/` - Homepage
+- `/about` and `/services` - Brand overview and service directory
+- `/catering`, `/corporate-events`, `/catering-partnerships`
+- `/private-chef-experiences`, `/chef-consultation`, `/culinary-experiences`
+- `/valtrix-fresh`, `/valtrix-studio`, `/equipment-rental`
+- `/packages-menu`, `/packages/:packageId`, `/menu/:foodId`
+- `/gallery` and `/contact`
 
 ### Admin Dashboard
-Access at `/admin/login`. Admin authentication and route protection are present, but inquiry management, content editing, media management, and analytics routes are placeholders and are not operational workflows. Do not rely on them to process production inquiries; arrange a separate monitored process until these modules are implemented.
+Access at `/admin/login`. Admins can review paginated inquiries, inspect submitted details, and update inquiry status. Content editing, media uploads, and analytics are not part of this release and are deliberately not shown in the admin navigation.
 
 ## Forms & Validation
 
 All forms use **react-hook-form** + **zod** validation:
 
-### 6 Inquiry Forms:
+### Public Inquiry Forms:
 1. **Catering Inquiry** - Event details, guest count, budget
 2. **Corporate Event** - Company info, event type, requirements
 3. **Meal Prep Inquiry** - Meal preferences, delivery frequency
-4. **Consultation Request** - Consultation type, availability
-5. **Masterclass Registration** - Course selection, experience level
-6. **General Contact** - Message submission
+4. **Fresh Order Inquiry** - Product and delivery details
+5. **Consultation Request** - Consultation type, availability
+6. **Private Chef Inquiry** - Event, guest count, and location
+7. **Masterclass Registration** - Course selection, experience level
+8. **General Contact** - Message submission
 
 All implemented public inquiry forms:
 - ✅ Client-side validation with zod
 - ✅ Real-time error feedback
 - ✅ Success/error states
 - ✅ Auto-clear on success
-- ✅ Submit to Supabase with timestamps
+- ✅ Submit through the server-validated `submit-inquiry` Edge Function
+- ✅ Server-side payload limits and per-IP/per-email rate limits
+- ✅ Direct anon/authenticated INSERT access to inquiry tables revoked by migration `005`
 
 ## Database Schema
 
@@ -183,7 +192,7 @@ All tables include:
 
 ## Security
 
-RLS policies are defined by the ordered migrations. Public inquiry inserts are intentionally allowed, while inquiry reads and admin operations require the appropriate access. Verify the effective policies in the hosted project after applying migrations. Client-side Zod validation is not an abuse-control boundary; add server-verified throttling/CAPTCHA before exposing forms to substantial public traffic.
+RLS policies are defined by the ordered migrations. Public inquiry writes go through the Edge Function; the browser roles cannot insert directly into inquiry tables. Inquiry reads and status changes require an authenticated admin. Apply and verify every migration in the hosted project before launch. The function enforces payload validation and rate limits; monitor abuse and add a CAPTCHA if production traffic shows it is needed.
 
 ## Build & Deploy
 
@@ -194,7 +203,7 @@ npm run build
 
 Outputs optimized build to `dist/`
 
-Run `npm run lint` and `npm run build` before deployment. Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting provider. These `VITE_` values are exposed to browsers; use only the publishable/anon key and never place a service-role key in a frontend environment variable.
+Run `npm run lint`, `npm test`, `npm run build`, and `npm audit` before deployment. Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting provider. These `VITE_` values are exposed to browsers; use only the publishable/anon key and never place a service-role key in a frontend environment variable. Set the final production domain before adding canonical and social-share URLs.
 
 ### Deploy Options
 
@@ -237,6 +246,7 @@ npm run dev       # Start dev server
 npm run build     # Build for production
 npm run preview   # Preview production build
 npm run lint      # Run ESLint
+npm test          # Run inquiry validation regression tests
 ```
 
 ### Code Style
@@ -249,7 +259,8 @@ npm run lint      # Run ESLint
 ## Supabase RLS Policies
 
 **Configured for:**
-- ✅ Public INSERT on inquiry tables (no auth needed)
+- ✅ Public inquiry submissions through the rate-limited Edge Function
+- ✅ Browser INSERT privileges on inquiry tables revoked by migration 005
 - ✅ Public SELECT on content tables (services, testimonials, gallery)
 - ✅ Admin full access to all tables
 - ✅ Automatic timestamp updates
@@ -277,12 +288,13 @@ npm run lint      # Run ESLint
 
 ## Known Limitations & Future Enhancements
 
-- Admin module pages (Content, Media, Analytics) are dashboard stubs
+- Admin content editing, media uploads, and analytics are not implemented
 - Payment processing not integrated (requires Stripe/Paystack)
-- Email notifications to admin not configured
+- Inquiry email notifications not configured; provide an operations monitoring procedure
 - Image optimization CDN not configured
 - Multi-language support not implemented
 - Mobile app not included
+- Final domain-specific canonical and Open Graph URLs require the production domain and share image
 
 ## Troubleshooting
 
@@ -293,8 +305,9 @@ Error: Supabase environment variables not configured
 → Check `.env.local` has correct VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 ### Form Submissions Not Working
-→ Check RLS policies in Supabase SQL Editor
-→ Ensure `status` ENUM type is created
+→ Confirm migrations `001`–`005` are applied and `submit-inquiry` is deployed
+→ Check Edge Function logs and its server-side Supabase environment
+→ Confirm the browser has only the publishable/anon key and the project URL is correct
 
 ### Images Not Loading
 → Update image URLs to your CDN

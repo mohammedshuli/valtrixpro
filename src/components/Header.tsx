@@ -12,6 +12,8 @@ const serviceLinks = [
   { label: 'Culinary Experiences', path: ROUTES.CULINARY_EXPERIENCES, icon: '🎓' },
   { label: 'Chef Consultation', path: ROUTES.CHEF_CONSULTATION, icon: '🗓️' },
   { label: 'Partnerships', path: ROUTES.CATERING_PARTNERSHIPS, icon: '🤝' },
+  { label: 'Valtrix Studio', path: ROUTES.VALTRIX_STUDIO, icon: '🎥' },
+  { label: 'Equipment Rental', path: ROUTES.EQUIPMENT_RENTAL, icon: '🍴' },
 ];
 
 const mainNav = [

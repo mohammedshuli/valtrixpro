@@ -1,56 +1,68 @@
 # Pre-Hosting Readiness Report
 
-## Verdict
+**Target launch date:** 1 November 2026
+**Assessment date:** 26 October 2026
+**Current verdict:** The application code has been improved, but **do not send production traffic until the required hosted Supabase and deployment checks below are complete**. Code changes in this repository do not apply migrations or deploy Edge Functions to the hosted project.
 
-**Not ready for a public production launch yet.** The current worktree passes lint, production build, and production dependency audit, and route-level splitting has reduced the main JavaScript chunk. The admin inquiry workflow is still not usable, public-form abuse controls are absent, and hosted Supabase, domain, privacy, backup, and end-to-end behavior remain unverified. Do not launch until the remaining production gates below are completed.
+## Completed in the repository
 
-This is a static repository audit plus local build, lint, and npm audit checks. I could not verify live Supabase settings, deployed migrations, production environment variables, backups, domain ownership, or real-browser form submissions.
+- Replaced homepage and service-grid remote imagery with bundled project assets. Fixed a homepage image reference that pointed into the source tree and would fail after a production build.
+- Replaced gallery fallback images with bundled assets, fixed gallery reads to use the schema's `image_path`, added active-image filtering, surfaced load errors, and provisioned a public read-only gallery bucket.
+- Added Valtrix Studio and Equipment Rental to the service cards, header menu, and footer. Their existing public routes remain `/valtrix-studio` and `/equipment-rental`.
+- Implemented an admin inquiry workflow: paginated category views, inquiry details, mail links, status updates, explicit query errors, and accurate all-record pending counts.
+- Removed nonfunctional admin content/media/analytics controls from the navigation. Their direct routes now clearly say those tools are not included in this release.
+- Added the `submit-inquiry` Supabase Edge Function with server-side validation, bounded request bodies, status assignment, and rate limits of 5 submissions per IP and 3 per email per 15-minute window.
+- Added migration 005 to revoke direct browser-role INSERT privileges on inquiry tables and to keep rate-limit data in a private schema. The service-role key is only used by the Edge Function.
+- Updated admin authorization checks to require the `admin` role and show Supabase verification errors instead of silently signing out. Disabled sign-ups in the local Supabase configuration.
+- Added Vercel security headers, a CSP, a valid local favicon, and removed stale preview-domain canonical/Open Graph URL/image values.
+- Upgraded Zod to 4.6.7, added regression tests for browser and server inquiry validation, and added a GitHub Actions workflow.
 
-## Completed Locally
+## Local verification
 
-- The lockfile now resolves the router to a release with no production audit findings.
-- Migration 004 removes temporary public inquiry-read policies and checks `role = 'admin'` in `is_admin()`.
-- Inquiry inserts no longer request returned rows, and Fresh/private-chef field mappings are preserved.
-- Current lint passes and the production build succeeds.
-- Route-level lazy loading reduced the main JS chunk from about 1,023 kB to 488 kB (142 kB gzip).
-- `.env.example` is present and contains placeholders only; README setup and security guidance were corrected.
-
-## P0: Resolve Before Public Traffic
-
-1. **Verify hosted RLS and admin authorization.** The initial schema migration contains permissive policies that later migrations replace. Apply migrations 001 through 004 in order, inspect effective `pg_policies`, and test anonymous inserts, protected inquiry reads, and denial for authenticated non-admin and guest-role users in the hosted project. Do not launch with only migration 001 applied. See [001_create_schema.sql](supabase/migrations/001_create_schema.sql#L222), [003_fix_admin_rls.sql](supabase/migrations/003_fix_admin_rls.sql#L24), and [004_harden_inquiry_access.sql](supabase/migrations/004_harden_inquiry_access.sql).
-
-2. **Protect public inquiry inserts from abuse.** Anonymous users can insert into inquiry tables under unconditional `WITH CHECK (true)` policies. Client-side Zod validation does not protect the database from scripted requests or spam. Add server-side throttling and abuse controls (for example, a CAPTCHA verified by an Edge Function), and enforce sensible constraints/limits at the database boundary. See [003_fix_admin_rls.sql](supabase/migrations/003_fix_admin_rls.sql#L108).
-
-## P1: Required Product and Release Work
-
-3. **Finish or remove the advertised admin workflows.** The inquiries, content, media, and analytics routes currently show explanatory text and inert buttons. Inquiry handling is the critical business workflow: implement list/detail/status updates first, or remove the promise/navigation and arrange a separate monitored process for incoming submissions. See [AdminInquiriesPage.tsx](src/pages/admin/AdminInquiriesPage.tsx#L8), [AdminContentPage.tsx](src/pages/admin/AdminContentPage.tsx#L8), [AdminMediaPage.tsx](src/pages/admin/AdminMediaPage.tsx#L8), and [AdminAnalyticsPage.tsx](src/pages/admin/AdminAnalyticsPage.tsx#L8).
-
-4. **Add automated tests and a CI release gate.** There are no test/spec files, no test script in `package.json`, and no GitHub Actions workflow. Add coverage for inquiry mapping and errors, course registration, admin sign-in and denial paths, and direct loading of nested routes. CI should run install from lockfile, lint, tests, and production build on every proposed release.
-
-5. **Configure production environment and admin access.** Configure the actual Supabase URL and publishable/anon key in the hosting environment. Disable public sign-ups if unnecessary, provision only intended admin accounts, and replace the seeded admin row if it is not intentional. Never put a service-role key in a `VITE_` variable. See [supabase.ts](src/lib/supabase.ts#L3) and [README.md](README.md).
-
-## P2: Complete Before or Shortly After Launch
-
-6. **Replace deployment-specific SEO URLs and supply the social image.** The canonical URL and Open Graph URLs point at a Vercel preview-style hostname, and the configured `/og-image.jpg` path does not resolve to an asset. Set the final canonical and social URLs, add a real share image, and verify the resulting links from the production domain. See [index.html](index.html#L14).
-
-7. **Add hosting security headers and confirm SPA behavior.** `vercel.json` only configures the SPA rewrite. Configure and verify appropriate security headers (including a considered CSP, HSTS, and MIME/content-sniffing protections) at the host, and smoke-test direct navigation and refresh on every nested route, including `/admin/login` and `/packages/:packageId`.
-
-8. **Set privacy and operational procedures for collected personal data.** Forms collect names, email addresses, phone numbers, event and delivery locations, dates, and dietary requirements. Publish an accurate privacy notice, define retention/deletion and access procedures, review applicable local data-protection requirements, configure database backups, and test a restore. Decide how staff receive timely alerts for new inquiries; database storage alone does not guarantee a response.
-
-## Checks Run (Current Worktree)
-
+- `npm run build`: **passed** (TypeScript and production bundle); built favicon asset verified.
 - `npm run lint`: **passed**.
-- `npm run build`: **passed**; route-level chunks emit successfully, with the largest shared main chunk about 488 kB (142 kB gzip).
-- `npm audit --omit=dev`: **passed**, zero vulnerabilities.
-- Production Supabase, admin/guest RLS, live submissions, domain metadata, and host security settings remain unverified.
+- `npm test`: **passed** (9 tests across browser schemas and server inquiry validation).
+- `npm audit`: **passed**, zero vulnerabilities across production and development dependencies.
+- Production preview direct-route smoke test: **passed** for `/`, `/services`, `/valtrix-studio`, `/equipment-rental`, `/gallery`, `/admin/login`, `/admin`, `/packages/demo`, and `/menu/demo` (all returned the SPA entry).
+- `git diff --check` and Vercel/package JSON parsing: **passed**.
+- Supabase CLI and Deno are not installed in this workspace, so the SQL migration and Edge Function have not been applied or deployed here.
+- No live Supabase, hosting, email delivery, backup, domain, or browser end-to-end test was possible.
 
-## Launch Gate
+## Required before 1 November 2026
 
-- [x] Production dependency audit, lint, and local production build pass.
-- [ ] Tests and required checks pass in CI.
-- [ ] Production Supabase has all migrations applied in order; effective RLS policies and admin/guest access tests pass.
-- [ ] Production environment variables and domain/SEO metadata are correct.
-- [ ] Public inquiry flows have been tested end to end, including error states and abuse controls.
-- [ ] Required admin workflow is implemented and usable by the operators who will handle incoming inquiries.
-- [ ] Backups, restore, privacy/retention, and inquiry notification procedures are confirmed.
-- [ ] Production smoke test passes on desktop and mobile, including direct route loads and refresh.
+### 1. Deploy and verify Supabase changes
+
+- Confirm the target Supabase project is the intended project for the production site.
+- Apply migrations `001` through `005` in order, using the Supabase CLI so migration history is recorded.
+- Deploy `supabase/functions/submit-inquiry` and confirm its Supabase URL and service-role secret are available to the function runtime. **Never expose the service-role key in frontend variables or source code.**
+- Disable public sign-ups in the hosted Auth settings; provision only named admin users and ensure their `admins` rows have `role = 'admin'`.
+- Verify effective `pg_policies` and grants: anon/authenticated roles must not directly insert or read inquiries; intended admins must be able to read and update them; guest/non-admin users must be denied.
+- Submit each public form against the hosted project. Verify valid rows receive `pending`, malformed/oversized requests are rejected, the rate limit returns 429, and failures are visible to users.
+
+### 2. Configure the real site and verify deployment
+
+- Set production `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting provider. Use only the publishable/anon key in the browser.
+- Set the final domain and add the matching canonical URL, Open Graph URL, and a real share image. These were intentionally removed rather than leaving preview URLs in production metadata.
+- Deploy and test direct loads and refreshes for `/`, `/services`, `/valtrix-studio`, `/equipment-rental`, `/admin/login`, `/admin`, and a nested package/menu route.
+- Verify CSP and other response headers on the deployed host. Check the browser console for blocked fonts, Supabase calls, images, or routes; the current CSP permits Google Fonts, Supabase, local assets, and legacy Unsplash menu/gallery images.
+- Test public forms, admin login/denial, inquiry pagination/details/status updates, error states, and responsive layout in desktop and mobile browsers.
+
+### 3. Confirm operational and privacy readiness
+
+- Publish an accurate privacy notice and confirm lawful handling of contact details, locations, event dates, and dietary information.
+- Define inquiry retention/deletion and staff access procedures; confirm who monitors new inquiries and how quickly they respond. Email notifications are not implemented.
+- Configure database backups and test restoring them before launch.
+- Confirm the current admin dashboard is sufficient for operations. Content editing, media uploads, analytics, payments, and automated inquiry email are not included in this release.
+
+## Launch gate
+
+- [x] Local production build passes.
+- [x] Full dependency audit passes with zero vulnerabilities.
+- [x] Public inquiry write path, status workflow, and rate-limiting code added.
+- [x] Studio/Equipment Rental navigation and bundled homepage/gallery/service imagery corrected.
+- [x] Final lint, test, build, and production audit pass on the current change set.
+- [ ] Hosted migrations 001–005 and the Edge Function deployed and verified.
+- [ ] Production Auth, admin allow-list/roles, and effective RLS/grants tested.
+- [ ] Production environment, domain, metadata, CSP, and routes verified.
+- [ ] End-to-end form and admin workflows tested against hosted Supabase.
+- [ ] Privacy, inquiry monitoring, backup, and restore procedures confirmed.

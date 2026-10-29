@@ -2,6 +2,15 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { GALLERY_CATEGORIES } from '../lib/constants';
 import { supabase } from '../lib/supabase';
+import cateringImage from '../assets/catering.jpg';
+import menuImage from '../assets/menu.jpg';
+import culinaryImage from '../assets/culinaryExperience.png';
+import privateChefImage from '../assets/privateChef.png';
+import freshImage from '../assets/valtrixfresh.png';
+import corporateImage from '../assets/coporate.jpg';
+import eventImage from '../assets/event.jpg';
+import consultationImage from '../assets/consultation.png';
+import partnershipImage from '../assets/partnership.jpg';
 
 type GalleryItem = {
   id: number | string;
@@ -11,21 +20,22 @@ type GalleryItem = {
 };
 
 const FALLBACK_GALLERY: GalleryItem[] = [
-  { id: 1, category: 'Events', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561484?w=800&h=800&fit=crop', title: 'Gala Dinner' },
-  { id: 2, category: 'Cuisine', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=800&fit=crop', title: 'Fine Dining Plate' },
-  { id: 3, category: 'Masterclasses', image: 'https://images.unsplash.com/photo-1556910103-1c02411297e3?w=800&h=800&fit=crop', title: 'Cooking Class' },
-  { id: 4, category: 'Team', image: 'https://images.unsplash.com/photo-1577611015e91-a360d90e6ab1?w=800&h=800&fit=crop', title: 'Our Team' },
-  { id: 5, category: 'Valtrix Fresh', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=800&fit=crop', title: 'Fresh Salads' },
-  { id: 6, category: 'Events', image: 'https://images.unsplash.com/photo-1519167758993-41d2f9c991cc?w=800&h=800&fit=crop', title: 'Corporate Event' },
-  { id: 7, category: 'Cuisine', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=800&fit=crop', title: 'Gourmet Dish' },
-  { id: 8, category: 'Valtrix Fresh', image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=800&fit=crop', title: 'Fresh Juice' },
-  { id: 9, category: 'Events', image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=800&fit=crop', title: 'Private Dining' },
+  { id: 1, category: 'Events', image: cateringImage, title: 'Catering Event' },
+  { id: 2, category: 'Cuisine', image: menuImage, title: 'Fine Dining' },
+  { id: 3, category: 'Masterclasses', image: culinaryImage, title: 'Cooking Class' },
+  { id: 4, category: 'Team', image: privateChefImage, title: 'Chef Experience' },
+  { id: 5, category: 'Valtrix Fresh', image: freshImage, title: 'Valtrix Fresh' },
+  { id: 6, category: 'Events', image: corporateImage, title: 'Corporate Event' },
+  { id: 7, category: 'Cuisine', image: eventImage, title: 'Culinary Experience' },
+  { id: 8, category: 'Valtrix Fresh', image: consultationImage, title: 'Fresh Food' },
+  { id: 9, category: 'Events', image: partnershipImage, title: 'Hospitality Partnership' },
 ];
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(FALLBACK_GALLERY);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -33,19 +43,28 @@ export default function GalleryPage() {
         const { data, error } = await supabase
           .from('gallery')
           .select('*')
+          .eq('is_active', true)
           .order('order', { ascending: true });
-        if (!error && data && data.length > 0) {
+        if (error) {
+          setErrorMessage('Live gallery images could not be loaded. Showing local preview images instead.');
+        } else if (data && data.length > 0) {
           setGalleryItems(
             data.map((item) => ({
               id: item.id,
               category: item.category || 'Events',
-              image: item.image_url || item.image,
+              image: item.image_url || (
+                typeof item.image_path === 'string' && /^https?:\/\//i.test(item.image_path)
+                  ? item.image_path
+                  : supabase.storage.from('gallery').getPublicUrl(item.image_path).data.publicUrl
+              ),
               title: item.title || item.alt_text || 'Gallery Image',
             }))
           );
         }
-      } catch {
-        // Keep fallback data
+      } catch (error) {
+        setErrorMessage(error instanceof Error
+          ? `Live gallery images could not be loaded: ${error.message}`
+          : 'Live gallery images could not be loaded. Showing local preview images instead.');
       } finally {
         setLoading(false);
       }
@@ -102,6 +121,8 @@ export default function GalleryPage() {
             ))}
           </div>
 
+          {errorMessage && <p role="status" className="mb-6 rounded bg-amber-100 p-4 text-amber-900">{errorMessage}</p>}
+
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1,2,3,4,5,6].map((i) => (
@@ -116,7 +137,7 @@ export default function GalleryPage() {
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="group relative aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all cursor-pointer"
+                  className="group relative aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all"
                 >
                   <img
                     src={item.image}

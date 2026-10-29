@@ -1,6 +1,15 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../../lib/constants';
+import privateChefImage from '../../assets/privateChef.png';
+import cateringImage from '../../assets/catering.jpg';
+import corporateImage from '../../assets/coporate.jpg';
+import freshImage from '../../assets/valtrixfresh.png';
+import culinaryImage from '../../assets/culinaryExperience.png';
+import consultationImage from '../../assets/consultation.png';
+import partnershipImage from '../../assets/partnership.jpg';
+import studioImage from '../../assets/culinaryExperience.png';
+import rentalImage from '../../assets/event.jpg';
 
 const serviceLinks: Record<string, string> = {
   'private-chef-experiences': ROUTES.PRIVATE_CHEF,
@@ -10,16 +19,20 @@ const serviceLinks: Record<string, string> = {
   'culinary-experiences': ROUTES.CULINARY_EXPERIENCES,
   'chef-consultation': ROUTES.CHEF_CONSULTATION,
   'catering-partnerships': ROUTES.CATERING_PARTNERSHIPS,
+  'valtrix-studio': ROUTES.VALTRIX_STUDIO,
+  'equipment-rental': ROUTES.EQUIPMENT_RENTAL,
 };
 
 const serviceImages: Record<string, string> = {
-  'private-chef-experiences': 'https://images.unsplash.com/photo-1556910103-1c02411297e3?w=600&h=600&fit=crop',
-  'premium-catering': 'https://images.unsplash.com/photo-1555939594-58d7cb561484?w=600&h=600&fit=crop',
-  'corporate-events': 'https://images.unsplash.com/photo-1519167758993-41d2f9c991cc?w=600&h=600&fit=crop',
-  'valtrix-fresh': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=600&fit=crop',
-  'culinary-experiences': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop',
-  'chef-consultation': 'https://images.unsplash.com/photo-1507668077129-56e32842fcaf?w=600&h=600&fit=crop',
-  'catering-partnerships': 'https://images.unsplash.com/photo-1552566626-52f8b29e6e80?w=600&h=600&fit=crop',
+  'private-chef-experiences': privateChefImage,
+  'premium-catering': cateringImage,
+  'corporate-events': corporateImage,
+  'valtrix-fresh': freshImage,
+  'culinary-experiences': culinaryImage,
+  'chef-consultation': consultationImage,
+  'catering-partnerships': partnershipImage,
+  'valtrix-studio': studioImage,
+  'equipment-rental': rentalImage,
 };
 
 import { SERVICES } from '../../lib/constants';
@@ -53,13 +66,14 @@ export default function ServicesGrid() {
       {SERVICES.map((service) => (
         <motion.div key={service.id} variants={itemVariants}>
           <Link
-            to={serviceLinks[service.slug] || ROUTES.CONTACT}
+            to={serviceLinks[service.slug] ?? ROUTES.SERVICES}
             className="group card cursor-pointer overflow-hidden h-full hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
           >
             <div className="relative h-48 overflow-hidden bg-gray-200">
               <img
-                src={serviceImages[service.slug] || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&h=400&fit=crop'}
+                src={serviceImages[service.slug] ?? cateringImage}
                 alt={service.name}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />
             </div>

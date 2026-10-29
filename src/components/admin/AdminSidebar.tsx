@@ -1,21 +1,25 @@
 import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ROUTES } from '../../lib/constants';
+import { useState } from 'react';
 
 export default function AdminSidebar() {
   const location = useLocation();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = ROUTES.ADMIN_LOGIN;
+    setLogoutError(null);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setLogoutError('Logout failed. Please retry.');
+      return;
+    }
+    window.location.assign(ROUTES.ADMIN_LOGIN);
   };
 
   const menuItems = [
     { label: 'Dashboard', icon: '📊', href: ROUTES.ADMIN },
     { label: 'Inquiries', icon: '📧', href: ROUTES.ADMIN_INQUIRIES },
-    { label: 'Content', icon: '📝', href: ROUTES.ADMIN_CONTENT },
-    { label: 'Media', icon: '🖼️', href: ROUTES.ADMIN_MEDIA },
-    { label: 'Analytics', icon: '📈', href: ROUTES.ADMIN_ANALYTICS },
   ];
 
   const isActive = (href: string) =>
@@ -45,7 +49,9 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="p-4 border-t border-[#E6A520]">
+        {logoutError && <p role="alert" className="mb-3 text-sm text-[#FFD77A]">{logoutError}</p>}
         <button
+          type="button"
           onClick={handleLogout}
           className="w-full btn-secondary text-[#7A4A00] hover:bg-[#FFD77A]"
         >

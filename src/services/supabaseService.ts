@@ -2,23 +2,26 @@ import { supabase } from '../lib/supabase';
 import * as types from '../types';
 import * as schemas from '../lib/validationSchemas';
 
-const submitInquiry = async <T extends Record<string, unknown>>(table: string, data: T): Promise<T> => {
-  const payload = {
-    ...data,
-    status: 'pending',
-  };
+type InquiryCategory = 'catering' | 'corporate' | 'meal' | 'consultation' | 'course' | 'contact';
 
-  const { error } = await supabase
-    .from(table)
-    .insert([payload]);
+const submitInquiry = async (category: InquiryCategory, data: Record<string, unknown>): Promise<void> => {
+  const { error } = await supabase.functions.invoke('submit-inquiry', {
+    body: { category, data },
+  });
 
-  if (error) throw new Error(error.message);
-  return payload as T;
+  if (!error) return;
+
+  let message = error.message;
+  if (error.context instanceof Response) {
+    const response = await error.context.clone().json() as { error?: unknown };
+    if (typeof response.error === 'string') message = response.error;
+  }
+  throw new Error(message);
 };
 
 // Catering Bookings
 export const submitCateringInquiry = async (data: schemas.CateringInquiry) => {
-  return submitInquiry('bookings', {
+  return submitInquiry('catering', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -33,7 +36,7 @@ export const submitCateringInquiry = async (data: schemas.CateringInquiry) => {
 
 // Corporate Events
 export const submitCorporateEventInquiry = async (data: schemas.CorporateEvent) => {
-  return submitInquiry('corporate_events', {
+  return submitInquiry('corporate', {
     company_name: data.company_name,
     contact_name: data.contact_name,
     email: data.email,
@@ -48,7 +51,7 @@ export const submitCorporateEventInquiry = async (data: schemas.CorporateEvent) 
 
 // Meal Inquiries
 export const submitMealInquiry = async (data: schemas.MealInquiry) => {
-  return submitInquiry('meal_inquiries', {
+  return submitInquiry('meal', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -61,7 +64,7 @@ export const submitMealInquiry = async (data: schemas.MealInquiry) => {
 
 // Consultations
 export const submitConsultationRequest = async (data: schemas.Consultation) => {
-  return submitInquiry('consultations', {
+  return submitInquiry('consultation', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -74,7 +77,7 @@ export const submitConsultationRequest = async (data: schemas.Consultation) => {
 
 // Private Chef Inquiries
 export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry) => {
-  return submitInquiry('consultations', {
+  return submitInquiry('consultation', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -87,7 +90,7 @@ export const submitPrivateChefInquiry = async (data: schemas.PrivateChefInquiry)
 
 // Course Registrations
 export const submitCourseRegistration = async (data: schemas.CourseRegistration) => {
-  return submitInquiry('course_registrations', {
+  return submitInquiry('course', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -100,7 +103,7 @@ export const submitCourseRegistration = async (data: schemas.CourseRegistration)
 
 // Contact Messages
 export const submitContactMessage = async (data: schemas.ContactMessage) => {
-  return submitInquiry('contact_messages', {
+  return submitInquiry('contact', {
     name: data.name,
     email: data.email,
     phone: data.phone || null,
@@ -111,7 +114,7 @@ export const submitContactMessage = async (data: schemas.ContactMessage) => {
 
 // Fresh Food Inquiries
 export const submitFreshInquiry = async (data: schemas.FreshInquiry) => {
-  return submitInquiry('meal_inquiries', {
+  return submitInquiry('meal', {
     name: data.name,
     email: data.email,
     phone: data.phone,
@@ -126,6 +129,7 @@ export const submitFreshInquiry = async (data: schemas.FreshInquiry) => {
 type PaginatedInquiryResult<T> = {
   data: T[];
   totalCount: number;
+  pendingCount: number;
   totalPages: number;
   currentPage: number;
   pageSize: number;
@@ -134,11 +138,13 @@ type PaginatedInquiryResult<T> = {
 const normalizePaginatedQuery = <T extends Record<string, unknown>>(
   items: T[] | null,
   count: number | null,
+  pendingCount: number | null,
   page: number,
   pageSize: number
 ): PaginatedInquiryResult<T> => ({
   data: items ?? [],
   totalCount: count ?? items?.length ?? 0,
+  pendingCount: pendingCount ?? 0,
   totalPages: pageSize > 0 ? Math.max(1, Math.ceil((count ?? items?.length ?? 0) / pageSize)) : 1,
   currentPage: page,
   pageSize,
@@ -160,27 +166,49 @@ export const fetchAllInquiries = async (
   const safePageSize = Math.max(1, pageSize);
   const offset = (safePage - 1) * safePageSize;
 
-  const [bookings, corporate, meals, consultations, courses, contacts] = await Promise.all([
+  const [bookings, corporate, meals, consultations, courses, contacts, pendingBookings, pendingCorporate, pendingMeals, pendingConsultations, pendingCourses, pendingContacts] = await Promise.all([
     supabase.from('bookings').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
     supabase.from('corporate_events').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
     supabase.from('meal_inquiries').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
     supabase.from('consultations').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
     supabase.from('course_registrations').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
     supabase.from('contact_messages').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(offset, offset + safePageSize - 1),
+    supabase.from('bookings').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('corporate_events').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('meal_inquiries').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('consultations').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('course_registrations').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabase.from('contact_messages').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
   ]);
 
+  const queryErrors = [
+    bookings.error, corporate.error, meals.error, consultations.error, courses.error, contacts.error,
+    pendingBookings.error, pendingCorporate.error, pendingMeals.error,
+    pendingConsultations.error, pendingCourses.error, pendingContacts.error,
+  ];
+  const queryError = queryErrors.find((error) => error !== null);
+  if (queryError) throw new Error(`Unable to load inquiries: ${queryError.message}`);
+
   return {
-    catering: normalizePaginatedQuery(bookings.data ?? [], bookings.count ?? null, safePage, safePageSize),
-    corporate: normalizePaginatedQuery(corporate.data ?? [], corporate.count ?? null, safePage, safePageSize),
-    meals: normalizePaginatedQuery(meals.data ?? [], meals.count ?? null, safePage, safePageSize),
-    consultations: normalizePaginatedQuery(consultations.data ?? [], consultations.count ?? null, safePage, safePageSize),
-    courses: normalizePaginatedQuery(courses.data ?? [], courses.count ?? null, safePage, safePageSize),
-    contact: normalizePaginatedQuery(contacts.data ?? [], contacts.count ?? null, safePage, safePageSize),
+    catering: normalizePaginatedQuery(bookings.data, bookings.count, pendingBookings.count, safePage, safePageSize),
+    corporate: normalizePaginatedQuery(corporate.data, corporate.count, pendingCorporate.count, safePage, safePageSize),
+    meals: normalizePaginatedQuery(meals.data, meals.count, pendingMeals.count, safePage, safePageSize),
+    consultations: normalizePaginatedQuery(consultations.data, consultations.count, pendingConsultations.count, safePage, safePageSize),
+    courses: normalizePaginatedQuery(courses.data, courses.count, pendingCourses.count, safePage, safePageSize),
+    contact: normalizePaginatedQuery(contacts.data, contacts.count, pendingContacts.count, safePage, safePageSize),
   };
 };
 
+export type InquiryTable =
+  | 'bookings'
+  | 'corporate_events'
+  | 'meal_inquiries'
+  | 'consultations'
+  | 'course_registrations'
+  | 'contact_messages';
+
 export const updateInquiryStatus = async (
-  table: string,
+  table: InquiryTable,
   id: string,
   status: types.InquiryStatus
 ) => {

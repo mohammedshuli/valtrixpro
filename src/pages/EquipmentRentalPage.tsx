@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../lib/constants';
-import rentalImage from '../assets/hero.png';
+import rentalImage from '../assets/event.jpg';
 
 const rentalItems = [
   {
@@ -108,7 +108,7 @@ export default function EquipmentRentalPage() {
           </div>
 
           <div className="overflow-hidden rounded-[2rem] shadow-[0_25px_60px_rgba(122,74,0,0.12)]">
-            <img src={rentalImage} alt="Catering equipment rental" className="h-full w-full object-cover min-h-[460px]" />
+            <img src={rentalImage} alt="Catering equipment rental" loading="lazy" className="h-full w-full object-cover min-h-[460px]" />
           </div>
         </div>
       </section>
